@@ -49,7 +49,7 @@ const getMessageTimestamp = (enabledAt) => {
   // const currentDate = moment(new Date()).startOf('day').add(offset, 'minutes');  // Central Time
   const currentDate = moment(new Date());  // Central Time
 
-  const diffInDays = messageEnabledAtLocal.diff(currentDate, 'days');
+  const diffInDays = currentDate.diff(messageEnabledAtLocal, 'days');
 
   let displayedDate = null;
   if (diffInDays === 1) {
