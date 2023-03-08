@@ -19,7 +19,7 @@ export default function StoryFrame({ navigation, route, children, footerStyle = 
         <Home width={24} height={24} onPress={() => {
           navigation.navigate({
             name: 'StoryHome',
-            params: story
+            params: route.params.story
           })
         }}/>
         <Logo width={24} height={24} onPress={() => {

@@ -1,6 +1,7 @@
 import {createSlice, configureStore} from '@reduxjs/toolkit';
 
 export const initialState = {
+  userToken: null,
   stories: [],
   currentStory: {},
   authors: {},
@@ -12,6 +13,9 @@ export const storeSlice = createSlice({
   name: 'storeSlice',
   initialState,
   reducers: {
+    setUserToken: (state, action) => {
+      state.userToken = action.payload;
+    },
     setCurrentStory: (state, action) => {
       state.currentStory = action.payload;
     },
@@ -31,6 +35,7 @@ export const storeSlice = createSlice({
 });
 
 export const {
+  setUserToken,
   setCurrentStory,
   setAuthors,
   setStories,

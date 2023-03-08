@@ -69,6 +69,8 @@ const generateAvailableConversations = (userStoryTextMessages, story) => {
     if (availableMessages.length > 0) {
       const unreadMessagesCount = availableMessages.filter((m) => !m.seenByUser).length;
 
+      console.log('availableMessages', availableMessages)
+
       totalAvailableMessages += unreadMessagesCount;
       parsedConversations[contactName] = availableMessages;
     }
@@ -80,12 +82,13 @@ const generateAvailableConversations = (userStoryTextMessages, story) => {
 export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const [unreadTextMessages, setUnreadTextMessages] = useState(0);
   const dispatch = useDispatch();
+  const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const textMessagesRefetchCounter = useSelector((state: any) => state.storeSlice.textMessagesRefetchCounter);
 
   const story = route.params;
 
   const fetchTextMessages = () => {
-    fetch(buildUrl(`/userStoryTextMessages?userToken=1234&storyId=${story._id}`))
+    fetch(buildUrl(`/userStoryTextMessages?userToken=${userToken}&storyId=${story._id}`))
       .then((res) => res.json())
       .then(({data}) => data)
       .then((userStoryTextMessages) => {

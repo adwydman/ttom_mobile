@@ -139,26 +139,26 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
 
     // test failure
 
-    // fetch(buildUrl('/userStoryTextMessages'), {
-    //   method: 'PUT',
-    //   body: JSON.stringify({
-    //     storyId: story._id,
-    //     conversationIds: Array.from(seenMessages),
-    //     userToken: '1234',
-    //     seenByUser: true,
-    //   }),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    // })
-    // .then(() => {
-    //   setTimeout(() => {
-    //     // throw new Error();
-    //   }, 1000)
-    // })
-    // .catch(() => {
-    //   dispatch(setTextMessages(textMessagesClone));
-    // })
+    fetch(buildUrl('/userStoryTextMessages'), {
+      method: 'PUT',
+      body: JSON.stringify({
+        storyId: story._id,
+        conversationIds: Array.from(seenMessages),
+        userToken: '1234',
+        seenByUser: true,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(() => {
+      setTimeout(() => {
+        // throw new Error();
+      }, 1000)
+    })
+    .catch(() => {
+      dispatch(setTextMessages(textMessagesClone));
+    })
   }
 
   let lastType: string|null = null;
@@ -177,7 +177,9 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const unseenMessages = [];
   const parsedMessages = [];
   // let firstUnreadMessage = false;
-  let firstUnreadMessage2 = false;
+  let firstUnreadMessage2 = null;
+
+  const areAllMessagesUnread = conversation.some(m => !m.seenByUser);
 
   for (let i = 0; i < conversation.length; i++) {
     const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
@@ -217,6 +219,17 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     const fullTimestamp = getMessageTimestamp(enabledAt);
     const shouldDisplayCenteredTimestamp = getShouldDisplayCenteredTimestamp(i, conversation);
 
+    if (firstUnreadMessage2 === null && seenByUser === false) {
+      firstUnreadMessage2 = message;
+
+      parsedMessages.push(
+        <View key={'unread'} style={{ position: 'relative', marginTop: 16, marginBottom: 16, alignItems: 'center' }}>
+          <View style={{ position: 'absolute', top: 6, height: 2, width: '100%', backgroundColor: 'black', opacity: 0.1}}></View>
+          <Text style={{ fontSize: 12, backgroundColor: '#f2f2f2', paddingLeft: 8, paddingRight: 8 }}>Unread</Text>
+        </View>
+      );
+    }
+
     if (shouldDisplayCenteredTimestamp) {
       parsedMessages.push(
         <View key={`${message}-${enabledAt}`} style={{ marginTop: 12, marginBottom: 12, alignItems: 'center' }}>
@@ -227,30 +240,31 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
       )
     }
 
-    if (firstUnreadMessage2 === false && seenByUser === false) {
-      firstUnreadMessage2 = true;
-
-      parsedMessages.push(
-        <View key={'unread'} style={{ position: 'relative', marginTop: 16, marginBottom: 16, alignItems: 'center' }}>
-          <View style={{ position: 'absolute', top: 6, height: 2, width: '100%', backgroundColor: 'black', opacity: 0.1}}></View>
-          <Text style={{ fontSize: 12, backgroundColor: '#f2f2f2', paddingLeft: 8, paddingRight: 8 }}>Unread</Text>
-        </View>
-      );
-    }
-
     parsedMessages.push(
       <InView
         key={i}
         onChange={onChange}
         style={wrapperStyle}
         onLayout={(event) => {
-          if (firstUnreadMessage.current === false && seenByUser === false) {
-            firstUnreadMessage.current = true;
-
+          if (message === firstUnreadMessage2) {
             if (scrollViewRef.current) {
-              scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y, animated: false})
+              firstUnreadMessage.current = true;
+
+              let offset = 40;
+              if (shouldDisplayCenteredTimestamp) {
+                offset = 80;
+              }
+
+              scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y - offset, animated: false})
             }
           }
+          // if (firstUnreadMessage.current === false && seenByUser === false) {
+          //   firstUnreadMessage.current = true;
+
+          //   if (scrollViewRef.current) {
+          //     scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y, animated: false})
+          //   }
+          // }
         }}
       >
         <Message

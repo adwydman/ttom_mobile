@@ -8,11 +8,13 @@ export const style = {
     lineHeight: 40,
     marginBottom: 6,
     fontFamily: 'Niveau_smallCaps',
+    color: 'white', // temp
   },
   storyAuthor: {
     fontSize: 26,
     lineHeight: 32,
     marginBottom: 12,
-    fontFamily: 'Niveau_smallCaps'
+    fontFamily: 'Niveau_smallCaps',
+    color: 'white', // temp
   },
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { View, Dimensions, ImageBackground, ScrollView } from 'react-native';
 import { IScreenProps } from '../shared/apitypes';
 import { Play } from '../components/svgs';
@@ -10,18 +11,22 @@ import TextArea from '../components/TextArea';
 import { buildUrl } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
 
+
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
   const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
+  const userToken = useSelector((state: any) => state.storeSlice.userToken);
+  
   const story = route.params;
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     // to do
     // create a route to check user stories
-    fetch(buildUrl(`/users?userToken=1234&storyId=${story._id}`))
+    fetch(buildUrl(`/users?userToken=${userToken}&storyId=${story._id}`))
       .then((response) => response.json())
       .then((response) => {
+        console.log('here?')
         setStoryAlreadyAdded(response.data.storyAdded)
       })
 
