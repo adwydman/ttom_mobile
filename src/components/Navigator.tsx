@@ -14,9 +14,9 @@ import ConfirmPurchaseScreen from 'screens/ConfirmPurchaseScreen';
 import StoryHomeScreen from 'screens/story/StoryHomeScreen';
 import StoryTextMessagesScreen from 'screens/story/StoryTextMessagesScreen';
 import StoryConversationScreen from 'screens/story/StoryConversationScreen';
-import { setUserToken } from '../stores';
+import { setUser, setUserToken } from '../stores';
+import { buildUrl } from 'utils/index';
 
-// const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
 
 export default function Navigator() {
@@ -35,11 +35,16 @@ export default function Navigator() {
 
   useEffect(() => {
     const asyncFn = async () => {
-      await SecureStore.deleteItemAsync('userToken')
-      // const userToken = await SecureStore.getItemAsync('userToken');
+      const storeUserToken = await SecureStore.getItemAsync('userToken');
 
-      if (userToken) {
-        dispatch(setUserToken(userToken))
+      if (storeUserToken) {
+        dispatch(setUserToken(storeUserToken))
+        const fetchResult = await fetch(buildUrl(`/users?userToken=${storeUserToken}`))
+        const result = await fetchResult.json();
+        
+        if (result.user) {
+          dispatch(setUser(result.user));
+        }
       }
 
       setLoading(false);
@@ -60,7 +65,7 @@ export default function Navigator() {
       <Stack.Navigator>
         {
           userToken !== null ? <>
-            <Stack.Screen name="Home" component={HomeDrawer} options={{ header: () => null }}/>
+            <Stack.Screen name="HomeDrawer" component={HomeDrawer} options={{ header: () => null }}/>
             <Stack.Screen name="StoryInfo" component={StoryInfoScreen} />
             <Stack.Screen name="ConfirmPurchase" component={ConfirmPurchaseScreen} options={{ headerBackTitle: 'Back', headerTitle: ''}} />
             <Stack.Screen name="StoryHome" component={StoryHomeScreen} options={{ header: () => null }} />

@@ -40,8 +40,8 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     }
   }
 
-  const onLogin = async () => {
-    const fetchResult = await fetch(buildUrl('/login'), {
+  const sendRequst = async (requestType) => {
+    const fetchResult = await fetch(buildUrl(`/${requestType}`), {
       method: 'POST',
       body: JSON.stringify({
         email,
@@ -55,29 +55,10 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     onSuccessfulRequest(result);
   }
 
-  const onRegister = async () => {
-    const fetchResult = await fetch(buildUrl('/register'), {
-      method: 'POST',
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const result = await fetchResult.json();
-    onSuccessfulRequest(result)
-  }
-
   const onButtonPress = async () => {
     setLoading(true);
 
-    if (mode === 'login') {
-      await onLogin();
-    } else {
-      await onRegister();
-    }
+    await sendRequst(mode);
 
     setLoading(false)
   }

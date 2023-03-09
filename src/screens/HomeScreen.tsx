@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ImageBackground, View, Image, Dimensions, FlatList, Pressable } from 'react-native';
+import { Platform, ImageBackground, View, Image, Dimensions, FlatList, Pressable } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
@@ -29,10 +29,23 @@ const extras = [
   }
 ]
 
-export function HomeHeader() {
+export function HomeHeader({navigation}) {
+  const viewStyle = {
+    ...style.homeHeader
+  } as any;
+
+  if (Platform.OS === 'ios') {
+    viewStyle.marginTop = 40;
+  } else if (Platform.OS === 'android') {
+    viewStyle.marginTop = 8;
+    viewStyle.marginBottom = 8;
+  }
+
   return (
-    <View style={style.homeHeader}>
-      <FontAwesome style={{ fontSize: 24 }} name={'user'} />
+    <View style={viewStyle}>
+      <Pressable style={{ width: 40 }} onPress={() => { navigation.openDrawer() }}>
+        <FontAwesome style={{ fontSize: 24 }} name={'user'} />
+      </Pressable>
       <FontAwesome style={{ fontSize: 24 }} name={'search'} />
     </View>
   );

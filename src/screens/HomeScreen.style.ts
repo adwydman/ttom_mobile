@@ -42,7 +42,6 @@ export const style = {
     paddingRight: 20,
     paddingTop: 10,
     paddingBottom: 10,
-    marginTop: 40,
     flexDirection: 'row',
     justifyContent: 'space-between' 
   }
