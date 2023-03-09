@@ -21,7 +21,8 @@
       "supportsTablet": true,
       "config": {
         "usesNonExemptEncryption": false
-      }
+      },
+      "bundleIdentifier": "com.adwydman.ttom"
     },
     "android": {
       "adaptiveIcon": {
@@ -41,10 +42,7 @@
         {
           "icon": "./local/assets/notification-icon.png",
           "color": "#ffffff",
-          "sounds": [
-            "./local/assets/notification-sound.wav",
-            "./local/assets/notification-sound-other.wav"
-          ]
+          "sounds": []
         }
       ]
     ],
