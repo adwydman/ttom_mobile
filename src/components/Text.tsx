@@ -1,7 +1,7 @@
 import { Text as ReactNativeText } from 'react-native';
 
 interface IProps {
-  children: React.ReactNode;
+  children: React.ReactNode | string;
   style?: any;
 }
 

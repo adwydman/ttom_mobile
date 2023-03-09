@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ttom_mobile",
-    "slug": "ttom_mobile",
+    "slug": "ttom",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -47,6 +47,12 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e9965a4f-a7df-44fe-a796-5fe297d0bab0"
+      }
+    },
+    "owner": "adwydman"
   }
 }

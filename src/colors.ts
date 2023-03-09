@@ -8,5 +8,6 @@ export const colors = {
   grey2: '#565A60',
   yellow: '#EAC435',
   pinkyOrange: '#FE4A49',
-  offWhite1: '#EEEEEE'
+  offWhite1: '#EEEEEE',
+  disabledBlue: '#c3d9fc',
 }

@@ -7,6 +7,7 @@ export const initialState = {
   authors: {},
   textMessages: [],
   textMessagesRefetchCounter: 0,
+  user: {},
 };
 
 export const storeSlice = createSlice({
@@ -15,6 +16,9 @@ export const storeSlice = createSlice({
   reducers: {
     setUserToken: (state, action) => {
       state.userToken = action.payload;
+    },
+    setUser: (state, action) => {
+      state.user = action.payload
     },
     setCurrentStory: (state, action) => {
       state.currentStory = action.payload;
@@ -36,6 +40,7 @@ export const storeSlice = createSlice({
 
 export const {
   setUserToken,
+  setUser,
   setCurrentStory,
   setAuthors,
   setStories,

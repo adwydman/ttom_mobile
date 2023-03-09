@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import { Platform } from 'react-native';
 import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import * as Notifications from 'expo-notifications';
@@ -14,14 +15,16 @@ Notifications.setNotificationHandler({
 });
 
 async function requestPermissionsAsync() {
-  return await Notifications.requestPermissionsAsync({
-    ios: {
-      allowAlert: true,
-      allowBadge: true,
-      allowSound: true,
-      allowAnnouncements: true,
-    },
-  });
+  if (Platform.OS === 'ios') {
+    return await Notifications.requestPermissionsAsync({
+      ios: {
+        allowAlert: true,
+        allowBadge: true,
+        allowSound: true,
+        allowAnnouncements: true,
+      },
+    });
+  }
 }
 
 function App() {

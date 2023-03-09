@@ -9,6 +9,10 @@ export const style = {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonDisabled: {
+    borderColor: colors.disabledBlue,
+    backgroundColor: colors.disabledBlue
+  },
   buttonFilled: {
     backgroundColor: colors.blue,
   },

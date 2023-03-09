@@ -7,8 +7,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeDrawer from 'drawers/HomeDrawer';
 import LoginScreen from 'screens/LoginScreen';
+import SplashScreen from 'screens/SplashScreen';
 import RegisterScreen from 'screens/RegisterScreen';
-import HomeScreen, { HomeHeader } from 'screens/HomeScreen';
 import StoryInfoScreen from 'screens/StoryInfoScreen';
 import ConfirmPurchaseScreen from 'screens/ConfirmPurchaseScreen';
 import StoryHomeScreen from 'screens/story/StoryHomeScreen';
@@ -26,6 +26,7 @@ export default function Navigator() {
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
 
   const [fontsLoaded] = useFonts({
+    LibreCaslonTextBold: require('../assets/fonts/LibreCaslonText-Bold.ttf'),
     Niveau_smallCaps: require('../assets/fonts/Niveau_smallCaps.ttf'),
     NiveauGroteskMedium: require('../assets/fonts/NiveauGroteskMedium.ttf'),
     NiveauGroteskRegular: require('../assets/fonts/NiveauGroteskRegular.ttf'),
@@ -68,8 +69,9 @@ export default function Navigator() {
           </>
           :
           <>
-            <Stack.Screen name="Login" component={LoginScreen} options={{ header: () => null }} />
-            <Stack.Screen name="Register" component={RegisterScreen} options={{ header: () => null }} />
+            <Stack.Screen name="Splash" component={SplashScreen} options={{ header: () => null }} />
+            <Stack.Screen name="Login" component={LoginScreen} options={{ headerTitle: 'Log In' }} />
+            <Stack.Screen name="Register" component={RegisterScreen} options={{ headerTitle: 'Sign Up' }} />
           </>
         }
       </Stack.Navigator>

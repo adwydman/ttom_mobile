@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react';
 
 export const GLOBALS = {
-  backendUrl: 'http://10.0.0.74:3000',
+  backendUrl: 'http://52.14.13.77:3000',
+  // backendUrl: 'http://10.0.0.74:3000',
 }
 
 export const buildUrl = (route: string): string => `${GLOBALS.backendUrl}${route}`;

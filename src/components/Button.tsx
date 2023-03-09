@@ -8,18 +8,46 @@ interface IProps {
   children: any;
   textStyle?: any;
   buttonStyle?: any;
-  type?: 'filled' | 'empty'
+  type?: 'filled' | 'empty';
+  loading?: boolean;
 }
 
 
-export default function Button({ image = null, children, buttonStyle = {}, textStyle = {}, type = 'filled', onPress = () => {} }: IProps) {
+export default function Button(props: IProps) {
+  const {
+    image = null,
+    children,
+    buttonStyle = {},
+    textStyle = {},
+    type = 'filled',
+    onPress = () => {},
+    loading
+  } = props;
+
   const buttonTypeStyle = type === 'filled' ? style.buttonFilled : style.buttonEmpty;
   const textTypeStyle = type === 'filled' ? style.textFilled : style.textEmpty;
 
+  let touchableOpacityStyle = {
+    ...buttonStyle,
+    ...style.button,
+    ...buttonTypeStyle
+  };
+
+  if (loading) {
+    touchableOpacityStyle = {
+      ...touchableOpacityStyle,
+      ...style.buttonDisabled
+    }
+  }
+
+  const buttonContent = loading ? 'Loading...' : children;
+
   return (
-    <TouchableOpacity style={{...buttonStyle, ...style.button, ...buttonTypeStyle}} onPress={onPress}>
+    <TouchableOpacity style={touchableOpacityStyle} onPress={onPress} disabled={loading}>
       { image }
-      <Text style={{...textStyle, ...style.text, ...textTypeStyle}}>{children}</Text>
+      <Text style={{...textStyle, ...style.text, ...textTypeStyle}}>
+        {buttonContent}
+      </Text>
     </TouchableOpacity>
   )
 }

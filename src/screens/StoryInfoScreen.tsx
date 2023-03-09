@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { View, Dimensions, ImageBackground, ScrollView } from 'react-native';
 import { IScreenProps } from '../shared/apitypes';
 import { Play } from '../components/svgs';
@@ -10,34 +10,22 @@ import Button from '../components/Button';
 import TextArea from '../components/TextArea';
 import { buildUrl } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
-
+import { setUser } from '../stores';
 
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
   const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector((state: any) => state.storeSlice.user);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   
   const story = route.params;
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
-    // to do
-    // create a route to check user stories
-    fetch(buildUrl(`/users?userToken=${userToken}&storyId=${story._id}`))
-      .then((response) => response.json())
-      .then((response) => {
-        console.log('here?')
-        setStoryAlreadyAdded(response.data.storyAdded)
-      })
-
-    // fetch(buildUrl(`/userStoryTextMessages?userToken=1234&storyId=${story._id}`))
-    //   .then((response) => response.json())
-    //   .then((response) => {
-    //     console.log('response', response)
-    //     if (response.data !== null) {
-    //       setStoryAlreadyAdded(true);
-    //     }
-    //   })
+    if (user.stories.includes(story._id)) {
+      setStoryAlreadyAdded(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -47,16 +35,20 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   }, [navigation, route]);
 
   const addToLibrary = async () => {
-    await fetch(buildUrl('/userStoryTextMessages'), {
+    const fetchResult = await fetch(buildUrl('/userStoryTextMessages'), {
       method: 'POST',
       body: JSON.stringify({
         storyId: story._id,
-        userToken: '1234',
+        userToken: userToken,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     })
+    const result = await fetchResult.json();
+    if (result.user) {
+      dispatch(setUser(result.user));
+    }
       
     navigation.navigate({
       name: 'ConfirmPurchase',
