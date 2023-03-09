@@ -69,8 +69,6 @@ const generateAvailableConversations = (userStoryTextMessages, story) => {
     if (availableMessages.length > 0) {
       const unreadMessagesCount = availableMessages.filter((m) => !m.seenByUser).length;
 
-      console.log('availableMessages', availableMessages)
-
       totalAvailableMessages += unreadMessagesCount;
       parsedConversations[contactName] = availableMessages;
     }

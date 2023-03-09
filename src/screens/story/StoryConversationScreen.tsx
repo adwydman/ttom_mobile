@@ -121,6 +121,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const [seenMessages, setSeenMessages] = useState(new Set());
   const [canRun, setCanRun] = useState(true)
   const textMessages = useSelector((state: any) => state.storeSlice.textMessages);
+  const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const conversation = textMessages[screenTitle];
   const textMessagesClone = cloneDeep(textMessages);
 
@@ -139,12 +140,14 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
 
     // test failure
 
+    console.log('here?')
+
     fetch(buildUrl('/userStoryTextMessages'), {
       method: 'PUT',
       body: JSON.stringify({
         storyId: story._id,
         conversationIds: Array.from(seenMessages),
-        userToken: '1234',
+        userToken: userToken,
         seenByUser: true,
       }),
       headers: {
@@ -213,6 +216,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     lastType = type;
 
     const onChange = (isVisible: boolean) => {
+      console.log('message', message)
       setSeenMessages(new Set([...Array.from(seenMessages), conversation[i]._id])) 
     }
 
