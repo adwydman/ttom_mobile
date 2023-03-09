@@ -1,11 +1,7 @@
 import { useRef, useEffect } from 'react';
+const config = require('../../config.json');
 
-export const GLOBALS = {
-  backendUrl: 'http://3.17.78.250:3000',
-  // backendUrl: 'http://10.0.0.74:3000',
-}
-
-export const buildUrl = (route: string): string => `${GLOBALS.backendUrl}${route}`;
+export const buildUrl = (route: string): string => `${config.BACKEND_URL}${route}`;
 
 export const useInterval = (callback, delay) => {
   const intervalRef = useRef(null);
