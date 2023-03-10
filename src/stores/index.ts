@@ -3,7 +3,7 @@ import {createSlice, configureStore} from '@reduxjs/toolkit';
 export const initialState = {
   userToken: null,
   stories: [],
-  currentStory: {},
+  currentStory: null,
   authors: {},
   textMessages: [],
   textMessagesRefetchCounter: 0,

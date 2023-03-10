@@ -4,7 +4,7 @@ import {
   DrawerItemList,
   DrawerItem
 } from '@react-navigation/drawer';
-import { View, Alert } from 'react-native';
+import { Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import HomeScreen, { HomeHeader } from 'screens/HomeScreen';

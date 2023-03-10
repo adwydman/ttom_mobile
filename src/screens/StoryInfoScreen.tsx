@@ -18,19 +18,19 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
+  const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   
-  const story = route.params;
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
-    if (user.stories.includes(story._id)) {
+    if (user.stories.includes(currentStory._id)) {
       setStoryAlreadyAdded(true);
     }
   }, []);
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: () => <Text>{story.title}</Text>
+      headerTitle: () => <Text>{currentStory.title}</Text>
     });
   }, [navigation, route]);
 
@@ -38,7 +38,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     const fetchResult = await fetch(buildUrl('/userStoryTextMessages'), {
       method: 'POST',
       body: JSON.stringify({
-        storyId: story._id,
+        storyId: currentStory._id,
         userToken: userToken,
       }),
       headers: {
@@ -52,14 +52,12 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
       
     navigation.navigate({
       name: 'ConfirmPurchase',
-      params: story
     });
   };
 
   const goToStory = () => {
     navigation.navigate({
       name: 'StoryHome',
-      params: story
     });
   }
 
@@ -68,11 +66,11 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
       <View style={{ width: '100%', height: windowWidth }}>
         <ImageBackground  
           style={style.imageCover}
-          source={{ uri: story.picture }}
+          source={{ uri: currentStory.picture }}
         >
           <Container>
-            <Text style={style.storyTitle}>{story.name}</Text>
-            <Text style={style.storyAuthor}>by {story.author}</Text>
+            <Text style={style.storyTitle}>{currentStory.name}</Text>
+            <Text style={style.storyAuthor}>by {currentStory.author}</Text>
           </Container>
         </ImageBackground>
       </View>
@@ -95,7 +93,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
             {
               showConfirmAddToLibrary &&
               <View>
-                <Text style={{ marginTop: 16 }}>Add {story.title} to your library for $0.00?</Text>
+                <Text style={{ marginTop: 16 }}>Add {currentStory.title} to your library for $0.00?</Text>
                 <View style={{ flex: 1, justifyContent: 'space-between', flexDirection: 'row' }}>
                   <Button type={'empty'} buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginRight: 8}} onPress={() => setShowConfirmAddToLibrary(false)}>
                     Nope
@@ -119,7 +117,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
         <Container>
           <H2>Summary</H2>
           <Text>
-            {story.description}
+            {currentStory.description}
           </Text>
         </Container>
       </TextArea>

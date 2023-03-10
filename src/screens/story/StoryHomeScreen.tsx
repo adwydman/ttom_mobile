@@ -81,12 +81,11 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const [unreadTextMessages, setUnreadTextMessages] = useState(0);
   const dispatch = useDispatch();
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
+  const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const textMessagesRefetchCounter = useSelector((state: any) => state.storeSlice.textMessagesRefetchCounter);
 
-  const story = route.params;
-
   const fetchTextMessages = () => {
-    fetch(buildUrl(`/userStoryTextMessages?userToken=${userToken}&storyId=${story._id}`))
+    fetch(buildUrl(`/userStoryTextMessages?userToken=${userToken}&storyId=${currentStory._id}`))
       .then((res) => res.json())
       .then(({data}) => data)
       .then((userStoryTextMessages) => {
@@ -96,7 +95,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
         //   "Bestie": [message3, message4, etc.]
         // }
 
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(userStoryTextMessages, story);
+        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(userStoryTextMessages, currentStory);
 
         // console.log('parsedConversations', parsedConversations)
 
@@ -129,7 +128,6 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
       onPress: () => {
         navigation.navigate({
           name: 'StoryMessages',
-          params: story
         })
       }
     },
@@ -181,13 +179,10 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   ]
 
   return (
-    <StoryFrame
-      navigation={navigation}
-      route={route}
-    >
+    <StoryFrame navigation={navigation}>
       <ImageBackground
         style={style.backgroundImage}
-        source={{ uri: story.picture }}
+        source={{ uri: currentStory.picture }}
       >
         <View style={style.blackOverlay}></View>
         <View style={style.iconContainer}>

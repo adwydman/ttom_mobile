@@ -115,13 +115,13 @@ function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail }
 
 export default function StoryConversationScreen({ navigation, route }: IScreenProps) {
   const dispatch = useDispatch();
-  const { story, screenTitle } = route.params;
+  const { screenTitle } = route.params;
   const scrollViewRef = useRef(null);
   const firstUnreadMessage = useRef(false);
   const [seenMessages, setSeenMessages] = useState(new Set());
-  const [canRun, setCanRun] = useState(true)
   const textMessages = useSelector((state: any) => state.storeSlice.textMessages);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
+  const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const conversation = textMessages[screenTitle];
   const textMessagesClone = cloneDeep(textMessages);
 
@@ -140,12 +140,10 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
 
     // test failure
 
-    console.log('here?')
-
     fetch(buildUrl('/userStoryTextMessages'), {
       method: 'PUT',
       body: JSON.stringify({
-        storyId: story._id,
+        storyId: currentStory._id,
         conversationIds: Array.from(seenMessages),
         userToken: userToken,
         seenByUser: true,
@@ -186,7 +184,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
 
   for (let i = 0; i < conversation.length; i++) {
     const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
-    const type = whoFrom === story.mainCharacter ? 'right' : 'left';
+    const type = whoFrom === currentStory.mainCharacter ? 'right' : 'left';
 
     if (!seenMessages.has(_id)) {
       unseenMessages.push(conversation[i]);
@@ -195,7 +193,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     let shouldShowTail = true;
 
     if (i < conversation.length - 1) {
-      const nextMessageType = conversation[i + 1].whoFrom === story.mainCharacter ? 'right' : 'left';
+      const nextMessageType = conversation[i + 1].whoFrom === currentStory.mainCharacter ? 'right' : 'left';
       if (nextMessageType === type) {
         shouldShowTail = false;
       }
@@ -284,10 +282,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   }
 
   return (
-    <StoryFrame
-      navigation={navigation}
-      route={route}
-    >
+    <StoryFrame navigation={navigation}>
       <IOScrollView
         ref={scrollViewRef}
         onLayout={() => {

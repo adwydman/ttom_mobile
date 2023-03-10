@@ -1,4 +1,5 @@
-import { View, ScrollView, ImageBackground, Dimensions } from 'react-native';
+import { View, ImageBackground, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import { IScreenProps } from '../shared/apitypes';
 import TextArea from '../components/TextArea';
 import Text from '../components/Text';
@@ -7,8 +8,9 @@ import Button from '../components/Button';
 import { style } from './ConfirmPurchaseScreen.style';
 
 
-export default function ConfirmPurchaseScreen({ navigation, route }: IScreenProps) {
-  const story = route.params;
+export default function ConfirmPurchaseScreen({ navigation }: IScreenProps) {
+  const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
+
   const windowWidth = Dimensions.get('window').width;
 
   return (
@@ -18,11 +20,11 @@ export default function ConfirmPurchaseScreen({ navigation, route }: IScreenProp
           <Text style={{ fontSize: 20, marginTop: '5%', marginBottom: '5%' }}>Awesome! You're ready to start!</Text>
           <ImageBackground  
             style={{...style.imageCover, width: windowWidth / 1.2, height: windowWidth / 1.2}}
-            source={{ uri: story.picture }}
+            source={{ uri: currentStory.picture }}
           >
             <Container>
-              <Text style={style.storyTitle}>{story.name}</Text>
-              <Text style={style.storyAuthor}>by {story.author}</Text>
+              <Text style={style.storyTitle}>{currentStory.name}</Text>
+              <Text style={style.storyAuthor}>by {currentStory.author}</Text>
             </Container>
           </ImageBackground>
         </View>
@@ -34,7 +36,6 @@ export default function ConfirmPurchaseScreen({ navigation, route }: IScreenProp
         <Button onPress={() => {
           navigation.navigate({
             name: 'StoryHome',
-            params: story
           })
         }}>
           Start the Story

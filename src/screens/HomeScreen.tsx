@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Platform, ImageBackground, View, Image, Dimensions, FlatList, Pressable } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import { IScreenProps } from '../shared/apitypes';
 import { buildUrl } from 'utils/index';
@@ -10,6 +10,7 @@ import Text from '../components/Text';
 import TextArea from 'components/TextArea';
 import { H1, H3 } from 'components/Headers';
 import Container from 'components/Container';
+import { setCurrentStory } from 'stores/index';
 
 const extras = [
   {
@@ -51,8 +52,10 @@ export function HomeHeader({navigation}) {
   );
 }
 
-export default function HomeScreen({ navigation, route }: IScreenProps) {
+export default function HomeScreen({ navigation }: IScreenProps) {
+  const dispatch = useDispatch();
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
+  const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
 
   Notifications.addNotificationResponseReceivedListener(response => {
     const { contactName, story } = response.notification.request.content.data
@@ -76,6 +79,16 @@ export default function HomeScreen({ navigation, route }: IScreenProps) {
       });
   }, [])
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (currentStory) {
+        dispatch(setCurrentStory({}));
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, currentStory]);
+
   return (
     <View style={{ backgroundColor: '#f7f7f8' }}>
       <FlatList
@@ -88,9 +101,9 @@ export default function HomeScreen({ navigation, route }: IScreenProps) {
               fetchedStories.map((story) => {
                 return (
                   <Pressable key={story.name} onPress={() => {
+                    dispatch(setCurrentStory(story));
                     navigation.navigate({
                       name: 'StoryInfo',
-                      params: story
                     })
                   }}>
                     <TextArea>

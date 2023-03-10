@@ -52,7 +52,6 @@ function Conversation({ lastMessage = '', contactName, onPress, hasUnreadMessage
 
 export default function StoryTextMessagesScreen({ navigation, route }: IScreenProps) {
   const textMessages = useSelector((state: any) => state.storeSlice.textMessages);
-  const story = route.params;
 
   useEffect(() => {
     navigation.setOptions({
@@ -65,10 +64,7 @@ export default function StoryTextMessagesScreen({ navigation, route }: IScreenPr
   );
 
   return (
-    <StoryFrame
-      navigation={navigation}
-      route={route}
-    >
+    <StoryFrame navigation={navigation}>
       {
         Object.keys(textMessages).map((contactName) => {
           const conversation = textMessages[contactName];
@@ -76,9 +72,6 @@ export default function StoryTextMessagesScreen({ navigation, route }: IScreenPr
           const { message } = conversation[conversation.length - 1];
           const hasUnreadMessages = conversation.find((m) => !m.seenByUser);
           
-          const unreadMessages = conversation.filter((m) => !m.seenByUser)
-          // console.log('unreadMessages', unreadMessages)
-
           return (
             <Conversation
               key={message}
@@ -88,7 +81,6 @@ export default function StoryTextMessagesScreen({ navigation, route }: IScreenPr
               onPress={() => {
                 navigation.navigate('StoryConversation', {
                   screenTitle: contactName,
-                  story: story
                 })
               }}
             />

@@ -8,8 +8,7 @@ interface IProps extends IScreenProps {
   footerStyle: any;
 }
  
-export default function StoryFrame({ navigation, route, children, footerStyle = {} }: IProps) {
-
+export default function StoryFrame({ navigation, children, footerStyle = {} }: IProps) {
   return (
     <>
       <View style={{ flex: 1, ...footerStyle }}>
@@ -19,7 +18,6 @@ export default function StoryFrame({ navigation, route, children, footerStyle = 
         <Home width={24} height={24} onPress={() => {
           navigation.navigate({
             name: 'StoryHome',
-            params: route.params.story
           })
         }}/>
         <Logo width={24} height={24} onPress={() => {
