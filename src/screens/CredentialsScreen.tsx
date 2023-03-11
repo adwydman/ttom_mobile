@@ -69,10 +69,11 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
         'Content-Type': 'application/json',
       },
     });
-    if (fetchResult.status === 200) {
+    if ([200, 201].includes(fetchResult.status)) {
       const result = await fetchResult.json();
       onSuccessfulRequest(result);
     } else {
+      console.log('fetchResult', fetchResult.status)
       if (requestType === 'login') {
         Alert.alert(
           'Incorrect Password',
