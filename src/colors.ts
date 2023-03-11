@@ -1,4 +1,5 @@
 export const colors = {
+  black: 'black',
   blue: '#0D47A1',
   white: 'white',
   beige: 'f7f7f8',
@@ -10,4 +11,5 @@ export const colors = {
   pinkyOrange: '#FE4A49',
   offWhite1: '#EEEEEE',
   disabledBlue: '#c3d9fc',
+  errorRed: '#ff0033'
 }
