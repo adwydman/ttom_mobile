@@ -15,6 +15,7 @@ import { setUser } from '../stores';
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
   const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
+  const [loadingAddToLibrary, setLoadingAddToLibrary] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
@@ -35,6 +36,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   }, [navigation, route]);
 
   const addToLibrary = async () => {
+    setLoadingAddToLibrary(true);
     const fetchResult = await fetch(buildUrl('/userStoryTextMessages'), {
       method: 'POST',
       body: JSON.stringify({
@@ -49,6 +51,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     if (result.user) {
       dispatch(setUser(result.user));
     }
+    setLoadingAddToLibrary(false);
       
     navigation.navigate({
       name: 'ConfirmPurchase',
@@ -98,7 +101,11 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
                   <Button type={'empty'} buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginRight: 8}} onPress={() => setShowConfirmAddToLibrary(false)}>
                     Nope
                   </Button>
-                  <Button buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginLeft: 8}} onPress={addToLibrary}>
+                  <Button
+                    buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginLeft: 8}}
+                    onPress={addToLibrary}
+                    loading={loadingAddToLibrary}
+                  >
                     Yes! Add it!
                   </Button>
                 </View>

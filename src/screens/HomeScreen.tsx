@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Platform, ImageBackground, View, Image, Dimensions, FlatList, Pressable } from 'react-native';
+import { Platform, View, Image, FlatList, Pressable } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,9 +7,10 @@ import { IScreenProps } from '../shared/apitypes';
 import { buildUrl } from 'utils/index';
 import { style } from './HomeScreen.style';
 import Text from '../components/Text';
-import TextArea from 'components/TextArea';
-import { H1, H3 } from 'components/Headers';
+import { H1 } from 'components/Headers';
 import Container from 'components/Container';
+import LibraryStory from 'components/LibraryStory';
+import LibraryStorySkeleton from 'components/skeletons/LibraryStorySkeleton';
 import { setCurrentStory } from 'stores/index';
 
 const extras = [
@@ -53,6 +54,7 @@ export function HomeHeader({navigation}) {
 }
 
 export default function HomeScreen({ navigation }: IScreenProps) {
+  const [isFetchingStories, setIsFetchingStories] = useState(false);
   const dispatch = useDispatch();
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
@@ -68,15 +70,22 @@ export default function HomeScreen({ navigation }: IScreenProps) {
 
   const [fetchedStories, setFetchedStories] = useState([]);
 
-  const windowWidth = Dimensions.get('window').width;
-
   useEffect(() => {
-    fetch(buildUrl(`/stories?userToken=${userToken}`))
-      .then(res => res.json())
-      .then((resStories) => {
-        const onlyBestFriends = resStories.filter((story) => story.name === 'Best Friends');
-        setFetchedStories(onlyBestFriends);
-      });
+    const asyncFn = async () => {
+      setIsFetchingStories(true);
+      // todo: add storiesSimple route to minimize the amount of data to transfer
+      const fetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
+      const result = await fetchResult.json();
+
+      const onlyBestFriends = result.filter((story) => story.name === 'Best Friends'); // todo: remove
+
+      setFetchedStories(onlyBestFriends);
+      setIsFetchingStories(false);
+      // setTimeout(() => {
+      // }, 3000)
+    }
+
+    asyncFn();
   }, [])
 
   useEffect(() => {
@@ -98,39 +107,15 @@ export default function HomeScreen({ navigation }: IScreenProps) {
               <H1>Browse Stories</H1>
             </Container>
             {
-              fetchedStories.map((story) => {
-                return (
-                  <Pressable key={story.name} onPress={() => {
-                    dispatch(setCurrentStory(story));
-                    navigation.navigate({
-                      name: 'StoryInfo',
-                    })
-                  }}>
-                    <TextArea>
-                      <View style={{ width: '100%', height: windowWidth }}>
-                        <ImageBackground  
-                          style={style.imageCover}
-                          source={{uri: story.picture }}
-                        >
-                          <Container>
-                            <Text style={style.storyTitle}>{story.name}</Text>
-                            <Text style={style.storyAuthor}>by {story.author}</Text>
-                          </Container>
-                        </ImageBackground>
-                      </View>
-                      <View style={style.storyDetailsWrapper}>
-                        <Container style={style.storyDetailsHeader}>
-                          <H3 style={style.storyDetailsHeaderItem}>{story.categories.join(', ')}</H3>
-                          <H3 style={style.storyDetailsHeaderItem}>{story.duration}</H3>
-                        </Container>
-                        <Container>
-                          <Text>{story.description}</Text>
-                        </Container>
-                      </View>
-                    </TextArea>
-                  </Pressable>
-                )
-              })
+              // isFetchingStories && <LibraryStorySkeleton />
+            }
+            {
+              fetchedStories.map((story: any) => <LibraryStory
+                  key={story.name}
+                  story={story}
+                  navigation={navigation}
+                />
+              )
             }
             <Container>
               <H1>Extras</H1>
