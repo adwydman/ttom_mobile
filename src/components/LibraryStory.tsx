@@ -1,16 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Platform, ImageBackground, View, Image, Dimensions, FlatList, Pressable } from 'react-native';
-import * as Notifications from 'expo-notifications';
-import { useDispatch, useSelector } from 'react-redux';
-import { FontAwesome } from '@expo/vector-icons';
-import { Skeleton } from '@rneui/themed';
-import { LinearGradient } from 'expo-linear-gradient';
-import { IScreenProps } from '../shared/apitypes';
-import { buildUrl } from 'utils/index';
+import { ImageBackground, View, Dimensions, Pressable } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { style } from './LibraryStory.style';
 import Text from '../components/Text';
 import TextArea from 'components/TextArea';
-import { H1, H3 } from 'components/Headers';
+import { H3 } from 'components/Headers';
 import Container from 'components/Container';
 import { setCurrentStory } from 'stores/index';
 
