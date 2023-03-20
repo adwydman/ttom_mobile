@@ -16,7 +16,6 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
   const dispatch = useDispatch();
 
   const user = useSelector((state: any) => state.storeSlice.user);
-
   const storyInfo = user.storyInfo.find(({ storyId }) => storyId === story._id)
 
   const unreadMessagesCount = storyInfo.availableMessagesCount - storyInfo.seenMessagesCount;
@@ -26,7 +25,6 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
   const roundedCompleted = completedPercentage >= 99 ? 99 : Math.round(completedPercentage);
 
   // const roundedCompleted = 88
-
   // console.log('roundedCompleted', roundedCompleted)
 
   const windowWidth = Dimensions.get('window').width;

@@ -24,8 +24,8 @@ function CustomDrawerContent(props) {
         text: 'Yes',
         onPress: async () => {
           await SecureStore.deleteItemAsync('userToken');
-          dispatch(setUser({}));
           dispatch(setUserToken(null));
+          dispatch(setUser({}));
         },
       },
       {text: 'No', onPress: () => {}}, // closes the alert

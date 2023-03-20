@@ -12,7 +12,7 @@ import Container from 'components/Container';
 import OwnedStory from 'components/OwnedStory';
 import LibraryStory from 'components/LibraryStory';
 import LibraryStorySkeleton from 'components/skeletons/LibraryStorySkeleton';
-import { setCurrentStory } from 'stores/index';
+import { setUser, setCurrentStory } from 'stores/index';
 
 const extras = [
   {
@@ -63,8 +63,6 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
 
-  console.log('user', user)
-
   Notifications.addNotificationResponseReceivedListener(response => {
     const { contactName, story } = response.notification.request.content.data
 
@@ -75,44 +73,39 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   });
 
   useEffect(() => {
-    const asyncFn = async () => {
-      setIsFetchingStories(true);
-      // todo: add storiesSimple route to minimize the amount of data to transfer
-      const fetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
-      const stories = await fetchResult.json();
-
-      const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
-      const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
-
-      // const onlyBestFriends = result.filter((story) => story.name === 'Best Friends'); // todo: remove
-      
-      // setTimeout(() => {
-      setDisplayableStories(filteredStories);
-      setPurchasedStories(userPurchasedStories);
-      setIsFetchingStories(false);
-      // }, 10000)
-    }
-
-    asyncFn();
-  }, [])
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
+    const unsubscribe = navigation.addListener('focus', async () => {
       if (currentStory) {
         dispatch(setCurrentStory({}));
       }
+
+      const userFetchResult = await fetch(buildUrl(`/users?userToken=${userToken}`))
+      const result = await userFetchResult.json();
+
+      dispatch(setUser(result.user));
+      
+      setIsFetchingStories(true);
+      // todo: add storiesSimple route to minimize the amount of data to transfer
+      const storyFetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
+      const stories = await storyFetchResult.json();
+
+      const filteredStories = stories.filter((story) => !result.user.stories.includes(story._id));
+      const userPurchasedStories = stories.filter((story) => result.user.stories.includes(story._id));
+
+      setDisplayableStories(filteredStories);
+      setPurchasedStories(userPurchasedStories);
+      setIsFetchingStories(false);
     });
 
     return unsubscribe;
   }, [navigation, currentStory]);
 
   return (
-    <View style={{ backgroundColor: '#f7f7f8', position: 'relative' }}>
+    <View>
       <FlatList
         ListHeaderComponent={
           <>
             {
-              purchasedStories && <>
+              purchasedStories.length > 0 && <>
                 <Container>
                   <H1>My Stories</H1>
                 </Container>
