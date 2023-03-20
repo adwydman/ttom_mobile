@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Platform, View, Image, FlatList, Pressable } from 'react-native';
+import { ImageBackground, Platform, View, Image, FlatList, Pressable, Dimensions } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
@@ -7,8 +7,9 @@ import { IScreenProps } from '../shared/apitypes';
 import { buildUrl } from 'utils/index';
 import { style } from './HomeScreen.style';
 import Text from '../components/Text';
-import { H1 } from 'components/Headers';
+import { H1, H3 } from 'components/Headers';
 import Container from 'components/Container';
+import OwnedStory from 'components/OwnedStory';
 import LibraryStory from 'components/LibraryStory';
 import LibraryStorySkeleton from 'components/skeletons/LibraryStorySkeleton';
 import { setCurrentStory } from 'stores/index';
@@ -54,10 +55,15 @@ export function HomeHeader({navigation}) {
 }
 
 export default function HomeScreen({ navigation }: IScreenProps) {
+  const [purchasedStories, setPurchasedStories] = useState([]);
+  const [displayableStories, setDisplayableStories] = useState([]);
   const [isFetchingStories, setIsFetchingStories] = useState(false);
   const dispatch = useDispatch();
+  const user = useSelector((state: any) => state.storeSlice.user);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
+
+  console.log('user', user)
 
   Notifications.addNotificationResponseReceivedListener(response => {
     const { contactName, story } = response.notification.request.content.data
@@ -68,21 +74,23 @@ export default function HomeScreen({ navigation }: IScreenProps) {
     })
   });
 
-  const [fetchedStories, setFetchedStories] = useState([]);
-
   useEffect(() => {
     const asyncFn = async () => {
       setIsFetchingStories(true);
       // todo: add storiesSimple route to minimize the amount of data to transfer
       const fetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
-      const result = await fetchResult.json();
+      const stories = await fetchResult.json();
 
-      const onlyBestFriends = result.filter((story) => story.name === 'Best Friends'); // todo: remove
+      const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
+      const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
 
-      setFetchedStories(onlyBestFriends);
-      setIsFetchingStories(false);
+      // const onlyBestFriends = result.filter((story) => story.name === 'Best Friends'); // todo: remove
+      
       // setTimeout(() => {
-      // }, 3000)
+      setDisplayableStories(filteredStories);
+      setPurchasedStories(userPurchasedStories);
+      setIsFetchingStories(false);
+      // }, 10000)
     }
 
     asyncFn();
@@ -99,10 +107,22 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   }, [navigation, currentStory]);
 
   return (
-    <View style={{ backgroundColor: '#f7f7f8' }}>
+    <View style={{ backgroundColor: '#f7f7f8', position: 'relative' }}>
       <FlatList
         ListHeaderComponent={
           <>
+            {
+              purchasedStories && <>
+                <Container>
+                  <H1>My Stories</H1>
+                </Container>
+                <FlatList
+                  data={purchasedStories}
+                  horizontal={true}
+                  renderItem={({ item }) => <OwnedStory story={item} navigation={navigation} />}
+                />
+              </>
+            }
             <Container>
               <H1>Browse Stories</H1>
             </Container>
@@ -110,7 +130,7 @@ export default function HomeScreen({ navigation }: IScreenProps) {
               // isFetchingStories && <LibraryStorySkeleton />
             }
             {
-              fetchedStories.map((story: any) => <LibraryStory
+              displayableStories.map((story: any) => <LibraryStory
                   key={story.name}
                   story={story}
                   navigation={navigation}

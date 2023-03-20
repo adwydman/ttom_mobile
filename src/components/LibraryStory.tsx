@@ -23,7 +23,14 @@ export default function LibraryStory({ story, navigation }: IProps) {
         name: 'StoryInfo',
       })
     }}>
-      <TextArea>
+      <TextArea
+        style={{
+          shadowOffset: {width: -2, height: 4},  
+          shadowColor: 'black',  
+          shadowOpacity: 0.2,  
+          shadowRadius: 3,  
+        }}
+      >
         <View style={{ width: '100%', height: windowWidth }}>
           <ImageBackground  
             style={style.imageCover}

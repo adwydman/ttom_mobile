@@ -50,6 +50,7 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
   }
 
   const onSuccessfulRequest = async (result: any) => {
+    console.log('result.user', result.user)
     if (result.user) {
       dispatch(setUser(result.user));
       dispatch(setUserToken(result.user.token));
