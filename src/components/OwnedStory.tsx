@@ -1,7 +1,9 @@
 import { ImageBackground, View, Dimensions, Pressable } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { LinearGradient } from 'expo-linear-gradient';
 import Container from 'components/Container';
-import Text from '../components/Text';
+import Text from 'components/Text';
+import StoryImage from './StoryImage';
 import { style } from './OwnedStory.style';
 import { setCurrentStory } from 'stores/index';
 
@@ -39,15 +41,10 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
     }}>
       <Container style={{ ...style.ownerStoryContainer, width: panelWidth }}>
         <View style={{ height: panelWidth, width: panelWidth }}>
-          <ImageBackground
-            style={style.imageCover}
-            source={{uri: story.picture}}
-          >
-            <Container>
-              <Text>{story.name}</Text>
-              <Text>by {story.author}</Text>
-            </Container>
-          </ImageBackground>
+          <StoryImage
+            story={story}
+            panelWidth={panelWidth}
+          />
         </View>
         <View style={style.progressContainer}>
           <View style={style.unreadMessagesContainer}>

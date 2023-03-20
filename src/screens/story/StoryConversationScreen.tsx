@@ -282,7 +282,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   }
 
   return (
-    <StoryFrame navigation={navigation}>
+    <StoryFrame navigation={navigation} onBothPress={optimisticallyUpdateMessages}>
       <IOScrollView
         ref={scrollViewRef}
         onLayout={() => {

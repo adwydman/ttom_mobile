@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ImageBackground, Platform, View, Image, FlatList, Pressable, Dimensions } from 'react-native';
+import { Platform, View, Image, FlatList, Pressable } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';

@@ -7,7 +7,7 @@ import Container from '../components/Container';
 import { H2 } from '../components/Headers';
 import Text from '../components/Text';
 import Button from '../components/Button';
-import TextArea from '../components/TextArea';
+import StoryContainer from '../components/StoryContainer';
 import { buildUrl } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
 import { setUser } from '../stores';
@@ -120,24 +120,24 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
           </Button>
         }
       </Container>
-      <TextArea>
+      <StoryContainer>
         <Container>
           <H2>Summary</H2>
           <Text>
             {currentStory.description}
           </Text>
         </Container>
-      </TextArea>
-      <TextArea>
+      </StoryContainer>
+      <StoryContainer>
         <Container>
           <H2>Information</H2>
         </Container>
-      </TextArea>
-      <TextArea>
+      </StoryContainer>
+      <StoryContainer>
         <Container>
           <H2>Review</H2>
         </Container>
-      </TextArea>
+      </StoryContainer>
     </ScrollView>
   )
 }

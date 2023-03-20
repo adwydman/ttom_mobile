@@ -5,22 +5,25 @@ import { style } from './StoryFrame.style';
 
 interface IProps extends IScreenProps {
   children: any;
-  footerStyle: any;
+  footerStyle?: any;
+  onBothPress?: any;
 }
  
-export default function StoryFrame({ navigation, children, footerStyle = {} }: IProps) {
+export default function StoryFrame({ navigation, children, footerStyle = {}, onBothPress = () => {} }: IProps) {
+  // todo: when storyhome button is clicked, the messages refetch needs to be triggered
+  const iconSize = 24;
   return (
     <>
       <View style={{ flex: 1, ...footerStyle }}>
         { children }
       </View>
       <View style={style.footer}>
-        <Home width={24} height={24} onPress={() => {
-          navigation.navigate({
-            name: 'StoryHome',
-          })
+        <Home width={iconSize} height={iconSize} onPress={async () => {
+          await onBothPress();
+          navigation.navigate('StoryHome');
         }}/>
-        <Logo width={24} height={24} onPress={() => {
+        <Logo width={iconSize} height={iconSize} onPress={async () => {
+          await onBothPress();
           navigation.navigate('Home')
         }}/>
       </View>

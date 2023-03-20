@@ -1,8 +1,9 @@
 import { ImageBackground, View, Dimensions, Pressable } from 'react-native';
 import { useDispatch } from 'react-redux';
+import StoryImage from './StoryImage';
 import { style } from './LibraryStory.style';
-import Text from '../components/Text';
-import TextArea from 'components/TextArea';
+import Text from 'components/Text';
+import TextArea from 'components/StoryContainer';
 import { H3 } from 'components/Headers';
 import Container from 'components/Container';
 import { setCurrentStory } from 'stores/index';
@@ -32,15 +33,12 @@ export default function LibraryStory({ story, navigation }: IProps) {
         }}
       >
         <View style={{ width: '100%', height: windowWidth }}>
-          <ImageBackground  
-            style={style.imageCover}
-            source={{uri: story.picture }}
-          >
-            <Container>
-              <Text style={style.storyTitle}>{story.name}</Text>
-              <Text style={style.storyAuthor}>by {story.author}</Text>
-            </Container>
-          </ImageBackground>
+          <StoryImage
+            story={story}
+            panelWidth={windowWidth}
+            storyTitleStyle={{ fontSize: 32, fontFamily: 'Niveau_smallCaps' }}
+            storyAuthorStyle={{ fontSize: 26, fontFamily: 'Niveau_smallCaps' }}
+          />
         </View>
         <View style={style.storyDetailsWrapper}>
           <Container style={style.storyDetailsHeader}>

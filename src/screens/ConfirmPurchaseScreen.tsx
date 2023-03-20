@@ -1,7 +1,7 @@
 import { View, ImageBackground, Dimensions } from 'react-native';
 import { useSelector } from 'react-redux';
 import { IScreenProps } from '../shared/apitypes';
-import TextArea from '../components/TextArea';
+import StoryContainer from '../components/StoryContainer';
 import Text from '../components/Text';
 import Container from '../components/Container';
 import Button from '../components/Button';
@@ -15,7 +15,7 @@ export default function ConfirmPurchaseScreen({ navigation }: IScreenProps) {
 
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end'}}>
-      <TextArea style={{ marginTop: '5%' }}>
+      <StoryContainer style={{ marginTop: '5%' }}>
         <View style={{ alignItems: 'center' }}>
           <Text style={{ fontSize: 20, marginTop: '5%', marginBottom: '5%' }}>Awesome! You're ready to start!</Text>
           <ImageBackground  
@@ -31,7 +31,7 @@ export default function ConfirmPurchaseScreen({ navigation }: IScreenProps) {
         <Container style={{ marginTop: '5%'}}>
           <Text style={{ fontSize: 16 }}>You’ll be observing this exciting drama through Jessica’s phone. The story starts at 9:00 pm when Jessica gets a strange text from an unknown number.</Text>
         </Container>
-      </TextArea>
+      </StoryContainer>
       <Container style={{ flex: 1, justifyContent: 'flex-end', marginBottom: 36 }}>
         <Button onPress={() => {
           navigation.navigate({
