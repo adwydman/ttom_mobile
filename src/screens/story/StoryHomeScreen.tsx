@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { flatten } from 'lodash';
-import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,18 @@ import Text from '../../components/Text'
 import { colors } from '../../colors'
 import { setTextMessages } from '../../stores';
 import { style } from './StoryHomeScreen.style';
+
+const refreshTime = 60 * 60 * 1000 // hour in miliseconds
+
+async function saveMessages(messageKey, messagesData) {
+  const timestamp = new Date().getTime();
+  const keyWithTimestamp = `messages_${messageKey}_${timestamp}`;
+  try {
+    await AsyncStorage.setItem(keyWithTimestamp, JSON.stringify(messagesData));
+  } catch (error) {
+    console.error('Error saving message:', error);
+  }
+}
 
 async function schedulePushNotification(title, body, data) {
   await Notifications.scheduleNotificationAsync({
@@ -102,16 +114,56 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
         setUnreadTextMessages(totalAvailableMessages);
 
         dispatch(setTextMessages(parsedConversations));
+
+        return saveMessages(currentStory._id, userStoryTextMessages);
       })
   }
 
   useEffect(() => {
-    fetchTextMessages();
-  }, [textMessagesRefetchCounter]);  
+
+    const asyncFn = async () => {
+      const allKeys = await AsyncStorage.getAllKeys();
+
+      const relevantKey = allKeys.find((key) => key.includes(currentStory._id));
+
+      if (relevantKey) {
+        const messagesString = await AsyncStorage.getItem(relevantKey);
+        const messages = JSON.parse(messagesString);
+
+        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(messages, currentStory);
+        setUnreadTextMessages(totalAvailableMessages);
+        dispatch(setTextMessages(parsedConversations));
+      } else {
+        fetchTextMessages();
+      }
+
+    }
+    asyncFn();
+
+    // fetchTextMessages();
+  }, []);  
 
   useInterval(() => {
-    fetchTextMessages();
-  }, 5000)
+    const asyncFn = async () => {
+      const allKeys = await AsyncStorage.getAllKeys();
+
+      const relevantKey = allKeys.find((key) => key.includes(currentStory._id));
+
+      if (relevantKey) {
+        const messagesString = await AsyncStorage.getItem(relevantKey);
+        const messages = JSON.parse(messagesString);
+
+        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(messages, currentStory);
+        setUnreadTextMessages(totalAvailableMessages);
+        dispatch(setTextMessages(parsedConversations));
+      } else {
+        fetchTextMessages();
+      }
+
+    }
+    asyncFn();
+    // fetchTextMessages();
+  }, refreshTime)
 
   // I'm gonna have to fetch the story info from the backend
   // when the user gets a notification
