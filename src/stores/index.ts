@@ -6,7 +6,6 @@ export const initialState = {
   currentStory: null,
   authors: {},
   textMessages: [],
-  textMessagesRefetchCounter: 0,
   user: {},
 };
 
@@ -32,9 +31,6 @@ export const storeSlice = createSlice({
     setTextMessages: (state, action) => {
       state.textMessages = action.payload;
     },
-    setTextMessagesRefetchCounter: (state, action) => {
-      state.textMessagesRefetchCounter = action.payload;
-    },
   },
 });
 
@@ -45,7 +41,6 @@ export const {
   setAuthors,
   setStories,
   setTextMessages,
-  setTextMessagesRefetchCounter,
 } = storeSlice.actions;
 
 export const rootStore = configureStore({

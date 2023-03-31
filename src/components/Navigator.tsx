@@ -15,6 +15,7 @@ import ConfirmPurchaseScreen from 'screens/ConfirmPurchaseScreen';
 import StoryHomeScreen from 'screens/story/StoryHomeScreen';
 import StoryTextMessagesScreen from 'screens/story/StoryTextMessagesScreen';
 import StoryConversationScreen from 'screens/story/StoryConversationScreen';
+import LoadingSplash from './LoadingSplash';
 import { setUser, setUserToken } from '../stores';
 import { buildUrl } from 'utils/index';
 
@@ -25,16 +26,19 @@ async function evictExpiredMessages() {
   const timeLimit = 60 * 60 * 1000; // 1 hours in milliseconds
   // const timeLimit = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
+
   try {
     const allKeys = await AsyncStorage.getAllKeys();
     const messagesKeys = allKeys.filter((key) => key.includes('messages'));
 
     for (const key of messagesKeys) {
-      const [_, _2, timestamp] = key.split('_');
-      const age = currentTime - parseInt(timestamp, 10);
-      if (age > timeLimit) {
-        await AsyncStorage.removeItem(key);
-      }
+      await AsyncStorage.removeItem(key);
+
+      // const [_, _2, timestamp] = key.split('_');
+      // const age = currentTime - parseInt(timestamp, 10);
+      // if (age > timeLimit) {
+      //   await AsyncStorage.removeItem(key);
+      // }
     }
   } catch (error) {
     console.error('Error evicting expired messages:', error);
@@ -82,11 +86,7 @@ export default function Navigator() {
   }, []);
 
   if (!fontsLoaded || loading) {
-    return (
-      <View style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-        <Image source={{ uri: 'https://media.tenor.com/RVvnVPK-6dcAAAAC/reload-cat.gif' }} style={{ width: 100, height: 100 }} />
-      </View>
-    );
+    return <LoadingSplash />;
   }
 
   return (

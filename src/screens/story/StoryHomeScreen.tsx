@@ -9,6 +9,7 @@ import CatSteps from 'components/CatSteps';
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from '../../shared/apitypes';
 import Text from '../../components/Text'
+import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
 import { setTextMessages } from '../../stores';
 import { style } from './StoryHomeScreen.style';
@@ -72,7 +73,7 @@ const generateAvailableConversations = (userStoryTextMessages, story) => {
 
   let totalAvailableMessages = 0;
   const parsedConversations = {};
-  Object.keys(conversationClusters).map((contactName) => {
+  Object.keys(conversationClusters).forEach((contactName) => {
     const clusters = conversationClusters[contactName];
 
     const availableClusters = clusters.filter((c) => c.__canBeDisplayed__);
@@ -91,78 +92,49 @@ const generateAvailableConversations = (userStoryTextMessages, story) => {
 
 export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const [unreadTextMessages, setUnreadTextMessages] = useState(0);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
-  const textMessagesRefetchCounter = useSelector((state: any) => state.storeSlice.textMessagesRefetchCounter);
 
-  const fetchTextMessages = () => {
-    fetch(buildUrl(`/userStoryTextMessages?userToken=${userToken}&storyId=${currentStory._id}`))
-      .then((res) => res.json())
-      .then(({data}) => data)
-      .then((userStoryTextMessages) => {
-        // generating:
-        // {
-        //   "773-555-1234": [message1, message2, etc.],
-        //   "Bestie": [message3, message4, etc.]
-        // }
+  const fetchTextMessages = async () => {
+    const fetchResult = await fetch(buildUrl(`/userStoryTextMessages?userToken=${userToken}&storyId=${currentStory._id}`));
+    const result = await fetchResult.json();
+    const userStoryTextMessages = result.data;
 
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(userStoryTextMessages, currentStory);
+    const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(userStoryTextMessages, currentStory);
 
-        // console.log('parsedConversations', parsedConversations)
-
-        setUnreadTextMessages(totalAvailableMessages);
-
-        dispatch(setTextMessages(parsedConversations));
-
-        return saveMessages(currentStory._id, userStoryTextMessages);
-      })
+    setUnreadTextMessages(totalAvailableMessages);
+    dispatch(setTextMessages(parsedConversations));
+    await saveMessages(currentStory._id, userStoryTextMessages);
   }
 
-  useEffect(() => {
+  const retrieveMessages = async () => {
+    setLoading(true);
+    const allKeys = await AsyncStorage.getAllKeys();
 
-    const asyncFn = async () => {
-      const allKeys = await AsyncStorage.getAllKeys();
+    const relevantKey = allKeys.find((key) => key.includes(currentStory._id));
 
-      const relevantKey = allKeys.find((key) => key.includes(currentStory._id));
+    if (relevantKey) {
+      const messagesString = await AsyncStorage.getItem(relevantKey);
+      const messages = JSON.parse(messagesString);
 
-      if (relevantKey) {
-        const messagesString = await AsyncStorage.getItem(relevantKey);
-        const messages = JSON.parse(messagesString);
-
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(messages, currentStory);
-        setUnreadTextMessages(totalAvailableMessages);
-        dispatch(setTextMessages(parsedConversations));
-      } else {
-        fetchTextMessages();
-      }
-
+      const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(messages, currentStory);
+      setUnreadTextMessages(totalAvailableMessages);
+      dispatch(setTextMessages(parsedConversations));
+    } else {
+      await fetchTextMessages();
     }
-    asyncFn();
 
-    // fetchTextMessages();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    retrieveMessages();
   }, []);  
 
   useInterval(() => {
-    const asyncFn = async () => {
-      const allKeys = await AsyncStorage.getAllKeys();
-
-      const relevantKey = allKeys.find((key) => key.includes(currentStory._id));
-
-      if (relevantKey) {
-        const messagesString = await AsyncStorage.getItem(relevantKey);
-        const messages = JSON.parse(messagesString);
-
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(messages, currentStory);
-        setUnreadTextMessages(totalAvailableMessages);
-        dispatch(setTextMessages(parsedConversations));
-      } else {
-        fetchTextMessages();
-      }
-
-    }
-    asyncFn();
-    // fetchTextMessages();
+    retrieveMessages();
   }, refreshTime)
 
   // I'm gonna have to fetch the story info from the backend
@@ -230,6 +202,10 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     // },
   ]
 
+  if (loading) {
+    return <LoadingSplash />
+  }
+
   return (
     <StoryFrame navigation={navigation}>
       <ImageBackground
@@ -267,70 +243,3 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     </StoryFrame>
   )
 }
-
-        // const unseenMessages = userStoryTextMessages.filter((m) => !m.seenByUser);
-        // const numberOfNotifications = unseenMessages.length;
-
-        // if (numberOfNotifications > 0) {
-
-        //   // what to do when there are multiple messages?
-        //   const { notificationSent, whoFrom, whoTo, message, _id } = unseenMessages[unseenMessages.length - 1]; 
-        //   const contactName = whoFrom === story.mainCharacter ? whoTo : whoFrom;
-
-        //   if (!notificationSent) {
-
-        //     // figure out why it's appearing multiple times
-        //     // schedulePushNotification(contactName, message, { contactName, story });
-
-        //     fetch(buildUrl('/userStoryTextMessages'), {
-        //       method: 'PUT',
-        //       body: JSON.stringify({
-        //         storyId: story._id,
-        //         conversationIds: [_id],
-        //         userToken: '1234',
-        //         notificationSent: true,
-        //       }),
-        //       headers: {
-        //         'Content-Type': 'application/json',
-        //       },
-        //     })
-        //   }
-        // } 
-
-        // if (totalAvailableMessages > 0) {
-
-          // // what to do when there are multiple messages?
-          // const { notificationSent, whoFrom, whoTo, message, _id } = unseenMessages[unseenMessages.length - 1]; 
-          // const contactName = whoFrom === story.mainCharacter ? whoTo : whoFrom;
-
-          // if (!notificationSent) {
-
-          //   // figure out why it's appearing multiple times
-          //   // schedulePushNotification(contactName, message, { contactName, story });
-
-          //   fetch(buildUrl('/userStoryTextMessages'), {
-          //     method: 'PUT',
-          //     body: JSON.stringify({
-          //       storyId: story._id,
-          //       conversationIds: [_id],
-          //       userToken: '1234',
-          //       notificationSent: true,
-          //     }),
-          //     headers: {
-          //       'Content-Type': 'application/json',
-          //     },
-          //   })
-          // }
-
-        // } 
-
-        // const parsedConversations = userStoryTextMessages.reduce((acc, message, index, array) => {
-        //   const contactName = message.whoFrom === story.mainCharacter ? message.whoTo : message.whoFrom;
-
-        //   if (!acc[contactName]) {
-        //     acc[contactName] = [];
-        //   }
-
-        //   acc[contactName].push(message);
-        //   return acc;
-        // }, {})
