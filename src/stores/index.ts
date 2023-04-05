@@ -7,6 +7,7 @@ export const initialState = {
   authors: {},
   textMessages: [],
   user: {},
+  rawMessages: null,
 };
 
 export const storeSlice = createSlice({
@@ -31,6 +32,9 @@ export const storeSlice = createSlice({
     setTextMessages: (state, action) => {
       state.textMessages = action.payload;
     },
+    setRawMessages: (state, action) => {
+      state.rawMessages = action.payload;
+    }
   },
 });
 
@@ -41,6 +45,7 @@ export const {
   setAuthors,
   setStories,
   setTextMessages,
+  setRawMessages,
 } = storeSlice.actions;
 
 export const rootStore = configureStore({

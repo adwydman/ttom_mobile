@@ -32,7 +32,7 @@ async function evictExpiredMessages() {
     const messagesKeys = allKeys.filter((key) => key.includes('messages'));
 
     for (const key of messagesKeys) {
-      await AsyncStorage.removeItem(key);
+      // await AsyncStorage.removeItem(key);
 
       // const [_, _2, timestamp] = key.split('_');
       // const age = currentTime - parseInt(timestamp, 10);

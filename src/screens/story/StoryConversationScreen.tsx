@@ -12,7 +12,7 @@ import Text from 'components/Text'
 import { BubbleTail } from 'components/svgs';
 import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
-import { setTextMessages } from '../../stores';
+import { setTextMessages, setRawMessages } from '../../stores';
 import { buildUrl } from 'utils/index';
 
 
@@ -120,23 +120,23 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const firstUnreadMessage = useRef(false);
   const [seenMessages, setSeenMessages] = useState(new Set());
   const textMessages = useSelector((state: any) => state.storeSlice.textMessages);
+  const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const conversation = textMessages[screenTitle];
-  const textMessagesClone = cloneDeep(textMessages);
 
   const optimisticallyUpdateMessages = async () => {
-    const seenMessagesArray = Array.from(seenMessages);
-    const newMessages = conversation.map((message) => {
-      const messageCopy = cloneDeep(message);
-      if (seenMessagesArray.some((messageId) => messageId === message._id)) {
-        messageCopy.seenByUser = true;
+    const newRawMessages = rawMessages.map((message) => {
+      let parsedMessage = message;
+      if (seenMessages.has(message._id)) {
+        parsedMessage = cloneDeep(message);
+        parsedMessage.seenByUser = true;
       }
-      return messageCopy;
-    });
 
-    textMessagesClone[screenTitle] = newMessages;
-    dispatch(setTextMessages(textMessagesClone));
+      return parsedMessage;
+    })
+
+    dispatch(setRawMessages(newRawMessages));
 
     // test failure
 
