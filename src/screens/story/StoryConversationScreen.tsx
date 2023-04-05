@@ -158,7 +158,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
       }, 1000)
     })
     .catch(() => {
-      dispatch(setTextMessages(textMessagesClone));
+      dispatch(setRawMessages(rawMessages));
     })
   }
 

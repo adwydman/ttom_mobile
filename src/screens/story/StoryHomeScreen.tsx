@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { flatten } from 'lodash';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
