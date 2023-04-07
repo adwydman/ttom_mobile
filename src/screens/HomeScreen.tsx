@@ -7,7 +7,7 @@ import { IScreenProps } from '../shared/apitypes';
 import { buildUrl } from 'utils/index';
 import { style } from './HomeScreen.style';
 import Text from '../components/Text';
-import { H1, H3 } from 'components/Headers';
+import { H1 } from 'components/Headers';
 import Container from 'components/Container';
 import OwnedStory from 'components/OwnedStory';
 import LibraryStory from 'components/LibraryStory';
@@ -78,26 +78,35 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         dispatch(setCurrentStory({}));
       }
 
+      // fetch user to see if there are any changes to stories
       const userFetchResult = await fetch(buildUrl(`/users?userToken=${userToken}`))
-      const result = await userFetchResult.json();
+      const userResult = await userFetchResult.json();
 
-      dispatch(setUser(result.user));
-      
-      setIsFetchingStories(true);
-      // todo: add storiesSimple route to minimize the amount of data to transfer
-      const storyFetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
-      const stories = await storyFetchResult.json();
-
-      const filteredStories = stories.filter((story) => !result.user.stories.includes(story._id));
-      const userPurchasedStories = stories.filter((story) => result.user.stories.includes(story._id));
-
-      setDisplayableStories(filteredStories);
-      setPurchasedStories(userPurchasedStories);
-      setIsFetchingStories(false);
+      dispatch(setUser(userResult.user));
     });
 
     return unsubscribe;
   }, [navigation, currentStory]);
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      setIsFetchingStories(true);
+
+      // todo: add storiesSimple route to minimize the amount of data to transfer
+      const storyFetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
+      const stories = await storyFetchResult.json();
+
+      const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
+      const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
+  
+      setDisplayableStories(filteredStories);
+      setPurchasedStories(userPurchasedStories);
+
+      setIsFetchingStories(false);
+    };
+
+    asyncFn();
+  }, [user])
 
   return (
     <View>
