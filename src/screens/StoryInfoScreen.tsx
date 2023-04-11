@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Dimensions, ImageBackground, ScrollView } from 'react-native';
+import { View, Dimensions, ScrollView } from 'react-native';
 import { IScreenProps } from '../shared/apitypes';
 import { Play } from '../components/svgs';
 import Container from '../components/Container';
@@ -14,15 +14,27 @@ import { setUser } from '../stores';
 import StoryImage from 'components/StoryImage';
 
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
-  const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
-  const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
-  const [loadingAddToLibrary, setLoadingAddToLibrary] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
-  
+  const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
+  const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
+  const [loadingAddToLibrary, setLoadingAddToLibrary] = useState(false);
+  const [fullStory, setFullStory] = useState(currentStory)
+
   const windowWidth = Dimensions.get('window').width;
+
+  useEffect(() => {
+    const asyncFn = async () => {
+      const fetchResult = await fetch(buildUrl(`/stories/${currentStory._id}?userToken=${userToken}`));
+      const story = await fetchResult.json();
+
+      setFullStory(story);
+    }
+
+    asyncFn();
+  }, []);
 
   useEffect(() => {
     if (user.stories.includes(currentStory._id)) {
@@ -69,7 +81,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     <ScrollView style={{ backgroundColor: '#f7f7f8' }}>
       <View style={{ width: '100%', height: windowWidth }}>
         <StoryImage
-          story={currentStory}
+          story={fullStory}
           panelWidth={windowWidth}
           storyTitleStyle={{ fontSize: 32, fontFamily: 'Niveau_smallCaps' }}
           storyAuthorStyle={{ fontSize: 26, fontFamily: 'Niveau_smallCaps' }}
@@ -94,7 +106,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
             {
               showConfirmAddToLibrary &&
               <View>
-                <Text style={{ marginTop: 16 }}>Add {currentStory.name} to your library for $0.00?</Text>
+                <Text style={{ marginTop: 16 }}>Add {fullStory.name} to your library for $0.00?</Text>
                 <View style={{ flex: 1, justifyContent: 'space-between', flexDirection: 'row' }}>
                   <Button type={'empty'} buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginRight: 8}} onPress={() => setShowConfirmAddToLibrary(false)}>
                     Nope
@@ -122,7 +134,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
         <Container>
           <H2>Summary</H2>
           <Text>
-            {currentStory.description}
+            {fullStory.description}
           </Text>
         </Container>
       </StoryContainer>
