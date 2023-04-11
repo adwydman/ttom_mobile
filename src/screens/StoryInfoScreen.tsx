@@ -8,7 +8,7 @@ import { H2 } from '../components/Headers';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import StoryContainer from '../components/StoryContainer';
-import { buildUrl } from 'utils/index';
+import { sendRequest } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
 import { setUser } from '../stores';
 import StoryImage from 'components/StoryImage';
@@ -27,13 +27,12 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      const fetchResult = await fetch(buildUrl(`/stories/${currentStory._id}`), {
+      const [story] = await sendRequest(`/stories/${currentStory._id}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${userToken}`,
         },
       });
-      const story = await fetchResult.json();
 
       setFullStory(story);
     }
@@ -55,7 +54,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
 
   const addToLibrary = async () => {
     setLoadingAddToLibrary(true);
-    const fetchResult = await fetch(buildUrl('/userStoryTextMessages'), {
+    const [result] = await sendRequest('/userStoryTextMessages', {
       method: 'POST',
       body: JSON.stringify({
         storyId: currentStory._id
@@ -65,7 +64,6 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
         'Authorization': `Bearer ${userToken}`,
       },
     })
-    const result = await fetchResult.json();
     if (result.user) {
       dispatch(setUser(result.user));
     }

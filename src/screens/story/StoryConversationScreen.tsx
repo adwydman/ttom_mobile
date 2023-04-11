@@ -13,7 +13,7 @@ import { BubbleTail } from 'components/svgs';
 import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
 import { setRawMessages } from '../../stores';
-import { buildUrl, isMainCharacter } from 'utils/index';
+import { sendRequest, isMainCharacter } from 'utils/index';
 
 const offset = moment().utcOffset();
 
@@ -139,7 +139,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
 
     // test failure
 
-    fetch(buildUrl('/userStoryTextMessages'), {
+    sendRequest('/userStoryTextMessages', {
       method: 'PUT',
       body: JSON.stringify({
         storyId: currentStory._id,

@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import { IScreenProps } from '../shared/apitypes';
-import { buildUrl, noAvailableStoriesMessage } from 'utils/index';
+import { sendRequest, noAvailableStoriesMessage } from 'utils/index';
 import { style } from './HomeScreen.style';
 import Text from '../components/Text';
 import { H1 } from 'components/Headers';
@@ -79,13 +79,12 @@ export default function HomeScreen({ navigation }: IScreenProps) {
       }
 
       // fetch user to see if there are any changes to stories
-      const userFetchResult = await fetch(buildUrl('/users'), {
+      const [userResult] = await sendRequest('/users', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${userToken}`,
         },
       })
-      const userResult = await userFetchResult.json();
 
       dispatch(setUser(userResult.user));
     });
@@ -107,13 +106,12 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         'description'
       ]
     
-      const storyFetchResult = await fetch(buildUrl(`/stories?fields=${fetchedFields.join(',')}`), {
+      const [stories] = await sendRequest(`/stories?fields=${fetchedFields.join(',')}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${userToken}`,
         },
       })
-      const stories = await storyFetchResult.json();
 
       const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
       const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));

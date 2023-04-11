@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { buildUrl, useInterval, generateAvailableConversations } from 'utils/index';
+import { sendRequest, useInterval, generateAvailableConversations } from 'utils/index';
 import CatSteps from 'components/CatSteps';
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from '../../shared/apitypes';
@@ -41,13 +41,12 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
 
   const fetchTextMessages = async () => {
-    const fetchResult = await fetch(buildUrl(`/userStoryTextMessages?storyId=${currentStory._id}`), {
+    const [result] = await sendRequest(`/userStoryTextMessages?storyId=${currentStory._id}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${userToken}`,
       },
     });
-    const result = await fetchResult.json();
     const userStoryTextMessages = result.data;
     dispatch(setRawMessages(userStoryTextMessages));
   }

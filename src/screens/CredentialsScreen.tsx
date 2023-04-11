@@ -5,7 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import Button from 'components/Button';
 import Text from 'components/Text';
 import Container from 'components/Container';
-import { buildUrl } from 'utils/index';
+import { sendRequest } from 'utils/index';
 import { setUser, setUserToken } from '../stores';
 import { colors } from '../colors'
 
@@ -59,7 +59,7 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
   }
 
   const sendRequst = async (requestType) => {
-    const fetchResult = await fetch(buildUrl(`/${requestType}`), {
+    const [result, fetchResult] = await sendRequest(`/${requestType}`, {
       method: 'POST',
       body: JSON.stringify({
         email,
@@ -70,7 +70,6 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
       },
     });
     if ([200, 201].includes(fetchResult.status)) {
-      const result = await fetchResult.json();
       onSuccessfulRequest(result);
     } else {
       console.log('fetchResult', fetchResult.status)

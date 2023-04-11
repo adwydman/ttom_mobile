@@ -17,7 +17,7 @@ import StoryTextMessagesScreen from 'screens/story/StoryTextMessagesScreen';
 import StoryConversationScreen from 'screens/story/StoryConversationScreen';
 import LoadingSplash from './LoadingSplash';
 import { setUser, setUserToken } from '../stores';
-import { buildUrl, sendRequest } from 'utils/index';
+import { sendRequest } from 'utils/index';
 
 const Stack = createNativeStackNavigator();
 
@@ -66,12 +66,11 @@ export default function Navigator() {
       // await SecureStore.deleteItemAsync('userToken');
       if (storeUserToken) {
         dispatch(setUserToken(storeUserToken))
-        const fetchResult = await fetch(buildUrl(`/users`), {
+        const [result] = await sendRequest('/users', {
           headers: {
             'Authorization': `Bearer ${storeUserToken}`,
           },
         })
-        const result = await fetchResult.json();
         
         if (result.user) {
           dispatch(setUser(result.user));
