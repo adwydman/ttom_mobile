@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { View, Image } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useSelector, useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';

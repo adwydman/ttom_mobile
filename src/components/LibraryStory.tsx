@@ -1,4 +1,4 @@
-import { ImageBackground, View, Dimensions, Pressable } from 'react-native';
+import { View, Dimensions, Pressable } from 'react-native';
 import { useDispatch } from 'react-redux';
 import StoryImage from './StoryImage';
 import { style } from './LibraryStory.style';

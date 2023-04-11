@@ -1,6 +1,5 @@
-import { ImageBackground, View, Dimensions, Pressable } from 'react-native';
+import { View, Dimensions, Pressable } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { LinearGradient } from 'expo-linear-gradient';
 import Container from 'components/Container';
 import Text from 'components/Text';
 import StoryImage from './StoryImage';

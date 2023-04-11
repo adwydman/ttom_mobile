@@ -1,5 +1,5 @@
-import { TouchableOpacity, View, Text, Animated } from 'react-native';
-import Svg, { Path, Circle, Rect } from 'react-native-svg';
+import { TouchableOpacity, View, Animated } from 'react-native';
+import Svg, { Path, Circle } from 'react-native-svg';
 
 interface IProps {
   width?: number;
