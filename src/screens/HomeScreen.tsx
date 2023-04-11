@@ -45,7 +45,7 @@ export function HomeHeader({navigation}) {
   }
 
   return (
-    <View style={viewStyle}>
+    <View style={viewStyle} testID="home-header">
       <Pressable style={{ width: 40 }} onPress={() => { navigation.openDrawer() }}>
         <FontAwesome style={{ fontSize: 24 }} name={'user'} />
       </Pressable>

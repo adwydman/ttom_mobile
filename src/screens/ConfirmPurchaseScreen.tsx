@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { View, ImageBackground, Dimensions } from 'react-native';
+import { HeaderBackButton } from '@react-navigation/elements'
 import { useSelector } from 'react-redux';
 import { IScreenProps } from '../shared/apitypes';
 import StoryContainer from '../components/StoryContainer';
@@ -12,6 +14,16 @@ export default function ConfirmPurchaseScreen({ navigation }: IScreenProps) {
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
 
   const windowWidth = Dimensions.get('window').width;
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <HeaderBackButton
+        onPress={() => {
+          navigation.navigate('HomeDrawer');
+        }}
+      />
+    });
+  }, [navigation]);
 
   return (
     <View style={{ flex: 1, justifyContent: 'flex-end'}}>

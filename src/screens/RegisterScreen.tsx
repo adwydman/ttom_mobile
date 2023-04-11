@@ -1,7 +1,7 @@
 import { IScreenProps } from '../shared/apitypes';
 import CredentialsScreen from './CredentialsScreen';
 
-export default function RegisterScreen({ navigation, route }: IScreenProps) {
+export default function RegisterScreen({ navigation }: IScreenProps) {
   return (
     <CredentialsScreen
       mode={'register'}

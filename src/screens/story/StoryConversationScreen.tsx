@@ -184,7 +184,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
 
   for (let i = 0; i < conversation.length; i++) {
     const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
-    const type = whoFrom === currentStory.mainCharacter ? 'right' : 'left';
+    const type = whoFrom.toLowerCase() === currentStory.mainCharacter.toLowerCase() ? 'right' : 'left';
 
     if (!seenMessages.has(_id)) {
       unseenMessages.push(conversation[i]);
@@ -193,7 +193,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     let shouldShowTail = true;
 
     if (i < conversation.length - 1) {
-      const nextMessageType = conversation[i + 1].whoFrom === currentStory.mainCharacter ? 'right' : 'left';
+      const nextMessageType = conversation[i + 1].whoFrom.toLowerCase() === currentStory.mainCharacter.toLowerCase() ? 'right' : 'left';
       if (nextMessageType === type) {
         shouldShowTail = false;
       }

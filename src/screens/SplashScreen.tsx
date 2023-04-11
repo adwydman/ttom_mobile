@@ -1,14 +1,8 @@
-import { useState } from 'react';
-import { View, TextInput, Dimensions, Pressable } from 'react-native';
-import { useDispatch } from 'react-redux';
-import * as SecureStore from 'expo-secure-store';
+import { View } from 'react-native';
 import Button from 'components/Button';
 import Text from 'components/Text';
 import Container from 'components/Container';
-import { H1 } from 'components/Headers';
 import { TtomLogo, SplashWave1, SplashWave2 } from 'components/svgs';
-import { buildUrl } from 'utils/index';
-import { setUser, setUserToken } from '../stores';
 import { colors } from '../colors'
 import { IScreenProps } from '../shared/apitypes';
 

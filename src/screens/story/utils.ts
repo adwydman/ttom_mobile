@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const generateConversationClusters = (userStoryTextMessages, story) => {
   let previousContactName = null;
   return userStoryTextMessages.reduce((acc, message, index, array) => {
-    const contactName = message.whoFrom === story.mainCharacter ? message.whoTo : message.whoFrom;
+    const contactName = message.whoFrom.toLowerCase() === story.mainCharacter.toLowerCase() ? message.whoTo : message.whoFrom;
 
     if (!acc[contactName]) {
       acc[contactName] = [];

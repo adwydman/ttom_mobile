@@ -11,6 +11,7 @@ import StoryContainer from '../components/StoryContainer';
 import { buildUrl } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
 import { setUser } from '../stores';
+import StoryImage from 'components/StoryImage';
 
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
@@ -31,7 +32,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: () => <Text>{currentStory.title}</Text>
+      headerTitle: () => <Text>{currentStory.name}</Text>
     });
   }, [navigation, route]);
 
@@ -67,15 +68,12 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   return (
     <ScrollView style={{ backgroundColor: '#f7f7f8' }}>
       <View style={{ width: '100%', height: windowWidth }}>
-        <ImageBackground  
-          style={style.imageCover}
-          source={{ uri: currentStory.picture }}
-        >
-          <Container>
-            <Text style={style.storyTitle}>{currentStory.name}</Text>
-            <Text style={style.storyAuthor}>by {currentStory.author}</Text>
-          </Container>
-        </ImageBackground>
+        <StoryImage
+          story={currentStory}
+          panelWidth={windowWidth}
+          storyTitleStyle={{ fontSize: 32, fontFamily: 'Niveau_smallCaps' }}
+          storyAuthorStyle={{ fontSize: 26, fontFamily: 'Niveau_smallCaps' }}
+        />
       </View>
       <Container>
         {
@@ -96,7 +94,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
             {
               showConfirmAddToLibrary &&
               <View>
-                <Text style={{ marginTop: 16 }}>Add {currentStory.title} to your library for $0.00?</Text>
+                <Text style={{ marginTop: 16 }}>Add {currentStory.name} to your library for $0.00?</Text>
                 <View style={{ flex: 1, justifyContent: 'space-between', flexDirection: 'row' }}>
                   <Button type={'empty'} buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginRight: 8}} onPress={() => setShowConfirmAddToLibrary(false)}>
                     Nope

@@ -63,6 +63,7 @@ export default function Navigator() {
     const asyncFn = async () => {
       const storeUserToken = await SecureStore.getItemAsync('userToken');
 
+      // await SecureStore.deleteItemAsync('userToken');
       if (storeUserToken) {
         dispatch(setUserToken(storeUserToken))
         const fetchResult = await fetch(buildUrl(`/users?userToken=${storeUserToken}`))
