@@ -27,7 +27,12 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
 
   useEffect(() => {
     const asyncFn = async () => {
-      const fetchResult = await fetch(buildUrl(`/stories/${currentStory._id}?userToken=${userToken}`));
+      const fetchResult = await fetch(buildUrl(`/stories/${currentStory._id}`), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userToken}`,
+        },
+      });
       const story = await fetchResult.json();
 
       setFullStory(story);
@@ -53,11 +58,11 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     const fetchResult = await fetch(buildUrl('/userStoryTextMessages'), {
       method: 'POST',
       body: JSON.stringify({
-        storyId: currentStory._id,
-        userToken: userToken,
+        storyId: currentStory._id
       }),
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`,
       },
     })
     const result = await fetchResult.json();

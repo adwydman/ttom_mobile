@@ -5,6 +5,13 @@ const config = require('../../config.json');
 
 export const buildUrl = (route: string): string => `${config.BACKEND_URL}${route}`;
 
+export const sendRequest = async (route: string, options: any) => {
+  const fetchResult = await fetch(buildUrl(route), options);
+  const result = await fetchResult.json();
+
+  return [result, fetchResult];
+}
+
 export const useInterval = (callback, delay) => {
   const intervalRef = useRef(null);
   const savedCallback = useRef(callback);

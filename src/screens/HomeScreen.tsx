@@ -79,7 +79,12 @@ export default function HomeScreen({ navigation }: IScreenProps) {
       }
 
       // fetch user to see if there are any changes to stories
-      const userFetchResult = await fetch(buildUrl(`/users?userToken=${userToken}`))
+      const userFetchResult = await fetch(buildUrl('/users'), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userToken}`,
+        },
+      })
       const userResult = await userFetchResult.json();
 
       dispatch(setUser(userResult.user));
@@ -102,7 +107,12 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         'description'
       ]
     
-      const storyFetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}&fields=${fetchedFields.join(',')}`))
+      const storyFetchResult = await fetch(buildUrl(`/stories?fields=${fetchedFields.join(',')}`), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${userToken}`,
+        },
+      })
       const stories = await storyFetchResult.json();
 
       const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
@@ -154,7 +164,6 @@ export default function HomeScreen({ navigation }: IScreenProps) {
                     <Text>{selectedMessage}</Text>
                   </Container>
                 })()
-                
             }
             <Container>
               <H1>Extras</H1>

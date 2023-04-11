@@ -144,11 +144,11 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
       body: JSON.stringify({
         storyId: currentStory._id,
         conversationIds: Array.from(seenMessages),
-        userToken: userToken,
         seenByUser: true,
       }),
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`,
       },
     })
     .catch(() => {

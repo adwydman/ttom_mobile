@@ -41,7 +41,12 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
 
   const fetchTextMessages = async () => {
-    const fetchResult = await fetch(buildUrl(`/userStoryTextMessages?userToken=${userToken}&storyId=${currentStory._id}`));
+    const fetchResult = await fetch(buildUrl(`/userStoryTextMessages?storyId=${currentStory._id}`), {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${userToken}`,
+      },
+    });
     const result = await fetchResult.json();
     const userStoryTextMessages = result.data;
     dispatch(setRawMessages(userStoryTextMessages));
