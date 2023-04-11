@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import { IScreenProps } from '../shared/apitypes';
-import { buildUrl } from 'utils/index';
+import { buildUrl, noAvailableStoriesMessage } from 'utils/index';
 import { style } from './HomeScreen.style';
 import Text from '../components/Text';
 import { H1 } from 'components/Headers';
@@ -92,8 +92,17 @@ export default function HomeScreen({ navigation }: IScreenProps) {
     const asyncFn = async () => {
       setIsFetchingStories(true);
 
-      // todo: add storiesSimple route to minimize the amount of data to transfer
-      const storyFetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}`))
+      const fetchedFields = [
+        '_id',
+        'name',
+        'author',
+        'picture',
+        'duration',
+        'categories',
+        'description'
+      ]
+    
+      const storyFetchResult = await fetch(buildUrl(`/stories?userToken=${userToken}&fields=${fetchedFields.join(',')}`))
       const stories = await storyFetchResult.json();
 
       const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
@@ -132,12 +141,20 @@ export default function HomeScreen({ navigation }: IScreenProps) {
               // isFetchingStories && <LibraryStorySkeleton />
             }
             {
-              displayableStories.map((story: any) => <LibraryStory
-                  key={story.name}
-                  story={story}
-                  navigation={navigation}
-                />
-              )
+              displayableStories.length ? 
+                displayableStories.map((story: any) => <LibraryStory
+                    key={story.name}
+                    story={story}
+                    navigation={navigation}
+                  />
+                ) : (() => {
+                  const randomIndex = Math.floor(Math.random() * noAvailableStoriesMessage.length);
+                  const selectedMessage = noAvailableStoriesMessage[randomIndex];
+                  return <Container style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                    <Text>{selectedMessage}</Text>
+                  </Container>
+                })()
+                
             }
             <Container>
               <H1>Extras</H1>

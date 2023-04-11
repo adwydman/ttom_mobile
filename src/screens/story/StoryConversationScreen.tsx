@@ -12,9 +12,8 @@ import Text from 'components/Text'
 import { BubbleTail } from 'components/svgs';
 import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
-import { setTextMessages, setRawMessages } from '../../stores';
-import { buildUrl } from 'utils/index';
-
+import { setRawMessages } from '../../stores';
+import { buildUrl, isMainCharacter } from 'utils/index';
 
 const offset = moment().utcOffset();
 
@@ -152,11 +151,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
         'Content-Type': 'application/json',
       },
     })
-    .then(() => {
-      setTimeout(() => {
-        // throw new Error();
-      }, 1000)
-    })
     .catch(() => {
       dispatch(setRawMessages(rawMessages));
     })
@@ -180,11 +174,9 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   // let firstUnreadMessage = false;
   let firstUnreadMessage2 = null;
 
-  const areAllMessagesUnread = conversation.some(m => !m.seenByUser);
-
   for (let i = 0; i < conversation.length; i++) {
     const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
-    const type = whoFrom.toLowerCase() === currentStory.mainCharacter.toLowerCase() ? 'right' : 'left';
+    const type = isMainCharacter(whoFrom) ? 'right' : 'left';
 
     if (!seenMessages.has(_id)) {
       unseenMessages.push(conversation[i]);
@@ -193,7 +185,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     let shouldShowTail = true;
 
     if (i < conversation.length - 1) {
-      const nextMessageType = conversation[i + 1].whoFrom.toLowerCase() === currentStory.mainCharacter.toLowerCase() ? 'right' : 'left';
+      const nextMessageType = isMainCharacter(conversation[i + 1].whoFrom) ? 'right' : 'left';
       if (nextMessageType === type) {
         shouldShowTail = false;
       }
@@ -260,13 +252,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
               scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y - offset, animated: false})
             }
           }
-          // if (firstUnreadMessage.current === false && seenByUser === false) {
-          //   firstUnreadMessage.current = true;
-
-          //   if (scrollViewRef.current) {
-          //     scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y, animated: false})
-          //   }
-          // }
         }}
       >
         <Message

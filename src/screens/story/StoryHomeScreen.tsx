@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { buildUrl, useInterval } from 'utils/index';
+import { buildUrl, useInterval, generateAvailableConversations } from 'utils/index';
 import CatSteps from 'components/CatSteps';
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from '../../shared/apitypes';
@@ -11,7 +11,6 @@ import Text from '../../components/Text'
 import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
 import { setTextMessages, setRawMessages } from '../../stores';
-import { generateAvailableConversations } from './utils';
 import { style } from './StoryHomeScreen.style';
 
 const refreshTime = 60 * 60 * 1000 // hour in miliseconds
@@ -50,23 +49,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
 
   const retrieveMessages = async () => {
     setLoading(true);
-    // const allKeys = await AsyncStorage.getAllKeys();
-
-    // const relevantKey = allKeys.find((key) => key.includes(currentStory._id));
-
-    // if (relevantKey) {
-    //   const messagesString = await AsyncStorage.getItem(relevantKey);
-    //   const messages = JSON.parse(messagesString);
-
-    //   const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(messages, currentStory);
-    //   setUnreadTextMessages(totalAvailableMessages);
-    //   dispatch(setTextMessages(parsedConversations));
-    // } else {
-    //   await fetchTextMessages();
-    // }
-
     await fetchTextMessages();
-
     setLoading(false);
   };
 
@@ -81,7 +64,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   useEffect(() => {
     const asyncFn = async () => {
       if (rawMessages && currentStory) {
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(rawMessages, currentStory);
+        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(rawMessages);
     
         setUnreadTextMessages(totalAvailableMessages);
         dispatch(setTextMessages(parsedConversations));
