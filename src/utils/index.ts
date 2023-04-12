@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { flatten } from 'lodash';
+import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const config = require('../../config.json');
 
@@ -115,3 +116,51 @@ export const saveMessages = async (messageKey, messagesData) => {
     console.error('Error saving message:', error);
   }
 }
+
+const offset = moment().utcOffset();
+
+export const getMessageTimestamp = (enabledAt) => {
+  const messageEnabledAtLocal = moment(enabledAt).add(offset, 'minutes');  // moment(enabledAt) is UTC time
+  // const currentDate = moment(new Date()).startOf('day').add(offset, 'minutes');  // Central Time
+  const currentDate = moment(new Date());  // Central Time
+
+  const diffInDays = currentDate.diff(messageEnabledAtLocal, 'days');
+
+  let displayedDate = null;
+  if (diffInDays === 1) {
+    displayedDate = 'Yesterday';
+  } else if (diffInDays > 1) {
+    const dayName = messageEnabledAtLocal.format('dddd')
+
+    if (diffInDays < 6) {
+      displayedDate = dayName;
+    } else if (diffInDays >= 6 && diffInDays <= 365) {
+      displayedDate = `${dayName}, ${messageEnabledAtLocal.format('MMM')} ${messageEnabledAtLocal.format('D')}`;
+    } else if (diffInDays > 365) {
+      displayedDate = `${dayName}, ${messageEnabledAtLocal.format('MMM')} ${messageEnabledAtLocal.format('D')} ${messageEnabledAtLocal.format('YYYY')}`;
+    }
+  } 
+
+  return `${displayedDate ? `${displayedDate} • ` : ''}${moment(enabledAt).format('h:mm a')}`;
+}
+
+export const getShouldDisplayCenteredTimestamp = (i, conversation) => {
+  let shouldDisplayCenteredTimestamp = false;
+
+  if (i === 0) {
+    shouldDisplayCenteredTimestamp = true;
+  } else {
+    const messageEnabledAtLocal = moment(conversation[i].enabledAt);  // moment(enabledAt) is UTC time
+    const previousMessageEnabledAt = moment(conversation[i-1].enabledAt);
+
+    const messageMinutesApart = messageEnabledAtLocal.diff(previousMessageEnabledAt, 'minutes');
+
+    if (messageMinutesApart >= 30) {
+      shouldDisplayCenteredTimestamp = true;
+    }
+  }
+
+  return shouldDisplayCenteredTimestamp;
+}
+
+export const isImage = (message: string) => /\.(jpg|jpeg|png|gif)$/.test(message);

@@ -1,10 +1,9 @@
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Image } from 'react-native';
 import { useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IOScrollView, InView } from 'react-native-intersection-observer'
 import { HeaderBackButton } from '@react-navigation/elements'
 import { cloneDeep } from 'lodash';
-import moment from 'moment';
 
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from 'shared/apitypes';
@@ -13,9 +12,14 @@ import { BubbleTail } from 'components/svgs';
 import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
 import { setRawMessages } from '../../stores';
-import { sendRequest, isMainCharacter } from 'utils/index';
+import {
+  sendRequest,
+  isMainCharacter,
+  getMessageTimestamp,
+  getShouldDisplayCenteredTimestamp,
+  isImage
+} from 'utils/index';
 
-const offset = moment().utcOffset();
 
 export function useTimeout(callback, delay) {
   const timeoutRef = useRef(null);
@@ -43,50 +47,6 @@ interface IMessageProps {
   shouldShowTail: boolean;
 }
 
-const getMessageTimestamp = (enabledAt) => {
-  const messageEnabledAtLocal = moment(enabledAt).add(offset, 'minutes');  // moment(enabledAt) is UTC time
-  // const currentDate = moment(new Date()).startOf('day').add(offset, 'minutes');  // Central Time
-  const currentDate = moment(new Date());  // Central Time
-
-  const diffInDays = currentDate.diff(messageEnabledAtLocal, 'days');
-
-  let displayedDate = null;
-  if (diffInDays === 1) {
-    displayedDate = 'Yesterday';
-  } else if (diffInDays > 1) {
-    const dayName = messageEnabledAtLocal.format('dddd')
-
-    if (diffInDays < 6) {
-      displayedDate = dayName;
-    } else if (diffInDays >= 6 && diffInDays <= 365) {
-      displayedDate = `${dayName}, ${messageEnabledAtLocal.format('MMM')} ${messageEnabledAtLocal.format('D')}`;
-    } else if (diffInDays > 365) {
-      displayedDate = `${dayName}, ${messageEnabledAtLocal.format('MMM')} ${messageEnabledAtLocal.format('D')} ${messageEnabledAtLocal.format('YYYY')}`;
-    }
-  } 
-
-  return `${displayedDate ? `${displayedDate} • ` : ''}${moment(enabledAt).format('h:mm a')}`;
-}
-
-const getShouldDisplayCenteredTimestamp = (i, conversation) => {
-  let shouldDisplayCenteredTimestamp = false;
-
-  if (i === 0) {
-    shouldDisplayCenteredTimestamp = true;
-  } else {
-    const messageEnabledAtLocal = moment(conversation[i].enabledAt);  // moment(enabledAt) is UTC time
-    const previousMessageEnabledAt = moment(conversation[i-1].enabledAt);
-
-    const messageMinutesApart = messageEnabledAtLocal.diff(previousMessageEnabledAt, 'minutes');
-
-    if (messageMinutesApart >= 30) {
-      shouldDisplayCenteredTimestamp = true;
-    }
-  }
-
-  return shouldDisplayCenteredTimestamp;
-}
-
 function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail }: IMessageProps) {
   const tailFill = type === 'left' ? colors.white : colors.blue
   const [showTimestamp, setShowTimestamp] = useState(false);
@@ -100,7 +60,11 @@ function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail }
     >
       <View>
         <View style={{...style.bubble, ...style[type], ...extraStyles}}>
-          <Text style={{...style.message, ...style[`${type}Font`]}}>{children}</Text>
+          {
+            isImage(children) ?
+              <Image source={{ uri: children }} style={{ width: 200, height: 200, resizeMode: 'cover',}} /> :
+              <Text style={{...style.message, ...style[`${type}Font`]}}>{children}</Text>
+          }
         </View>
         { shouldShowTail && <BubbleTail style={{...style.tail, ...style[`${type}Tail`]}} fill={tailFill} /> }
       </View>
