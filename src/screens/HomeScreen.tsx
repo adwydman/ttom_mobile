@@ -58,6 +58,10 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   const [purchasedStories, setPurchasedStories] = useState([]);
   const [displayableStories, setDisplayableStories] = useState([]);
   const [isFetchingStories, setIsFetchingStories] = useState(false);
+  const [noStoriesAvailableMessage] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * noAvailableStoriesMessage.length);
+    return noAvailableStoriesMessage[randomIndex];
+  })
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
@@ -156,10 +160,8 @@ export default function HomeScreen({ navigation }: IScreenProps) {
                     navigation={navigation}
                   />
                 ) : (() => {
-                  const randomIndex = Math.floor(Math.random() * noAvailableStoriesMessage.length);
-                  const selectedMessage = noAvailableStoriesMessage[randomIndex];
                   return <Container style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <Text>{selectedMessage}</Text>
+                    <Text>{noStoriesAvailableMessage}</Text>
                   </Container>
                 })()
             }
