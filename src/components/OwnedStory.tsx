@@ -21,10 +21,7 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
   const displayedUnreadCount = unreadMessagesCount > 20 ? '20+' : unreadMessagesCount;
 
   const completedPercentage = 100 * storyInfo.seenMessagesCount / storyInfo.messagesCount;
-  const roundedCompleted = completedPercentage >= 99 ? 99 : Math.round(completedPercentage);
-
-  // const roundedCompleted = 88
-  // console.log('roundedCompleted', roundedCompleted)
+  const roundedCompleted = completedPercentage >= 99 ? 100 : Math.round(completedPercentage);
 
   const windowWidth = Dimensions.get('window').width;
   const panelWidth = windowWidth / 2.25
@@ -45,10 +42,16 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
         </View>
         <View style={style.progressContainer}>
           <View style={style.unreadMessagesContainer}>
-            <View style={style.unreadMessagesBackground}>
-              <Text style={style.unreadMessagesFont}>{displayedUnreadCount}</Text>
-            </View>
-            <Text style={style.unreadMessagesFont}> Unread Texts</Text>
+            {
+              roundedCompleted === 100 ?
+                <Text style={style.unreadMessagesFont}>Story Completed!</Text> :
+                <>
+                  <View style={style.unreadMessagesBackground}>
+                    <Text style={style.unreadMessagesFont}>{displayedUnreadCount}</Text>
+                  </View>
+                  <Text style={style.unreadMessagesFont}> Unread Texts</Text>
+                </>
+            }
           </View>
           <View style={style.percentageProgressContainer}>
             <Text style={style.percentageFont}>{roundedCompleted}%</Text>
