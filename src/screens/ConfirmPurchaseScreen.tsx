@@ -7,6 +7,7 @@ import StoryContainer from '../components/StoryContainer';
 import Text from '../components/Text';
 import Container from '../components/Container';
 import Button from '../components/Button';
+import StoryImage from 'components/StoryImage';
 import { style } from './ConfirmPurchaseScreen.style';
 
 

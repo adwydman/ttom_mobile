@@ -72,7 +72,6 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     if ([200, 201].includes(fetchResult.status)) {
       onSuccessfulRequest(result);
     } else {
-      console.log('fetchResult', fetchResult.status)
       if (requestType === 'login') {
         Alert.alert(
           'Incorrect Password',

@@ -50,7 +50,7 @@ export const isMainCharacter = (storyCharacter: string) => {
   return storyCharacter.toLowerCase() === 'me';
 }
 
-const generateConversationClusters = (userStoryTextMessages) => {
+export const generateConversationClusters = (userStoryTextMessages) => {
   let previousContactName = null;
   return userStoryTextMessages.reduce((acc, message, index, array) => {
     const contactName = isMainCharacter(message.whoFrom) ? message.whoTo : message.whoFrom;
@@ -77,7 +77,10 @@ const generateConversationClusters = (userStoryTextMessages) => {
       cluster = conversation[conversation.length - 1];
     }
 
-    cluster.push(message);
+    const now = new Date();
+    if (new Date(message.enabledAt) <= now) {
+      cluster.push(message);
+    }
 
     previousContactName = contactName
 

@@ -70,10 +70,12 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   Notifications.addNotificationResponseReceivedListener(response => {
     const { contactName, story } = response.notification.request.content.data
 
-    navigation.navigate('StoryConversation', {
-      screenTitle: contactName,
-      story: story,
-    })
+    console.log('here!')
+
+    // navigation.navigate('StoryConversation', {
+    //   screenTitle: contactName,
+    //   story: story,
+    // })
   });
 
   useEffect(() => {

@@ -27,6 +27,13 @@ async function requestPermissionsAsync() {
   }
 }
 
+async function schedulePushNotification(title, body, data) {
+  await Notifications.scheduleNotificationAsync({
+    content: { title, body, data, },
+    trigger: { seconds: 1 },
+  });
+}
+
 function App() {
   useEffect(() => {
     requestPermissionsAsync()

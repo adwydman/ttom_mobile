@@ -62,8 +62,19 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   }, []);  
 
   useInterval(() => {
-    retrieveMessages();
-  }, refreshTime)
+    // retrieveMessages();
+    const asyncFn = async () => {
+      if (rawMessages && currentStory) {
+        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(rawMessages);
+    
+        setUnreadTextMessages(totalAvailableMessages);
+        dispatch(setTextMessages(parsedConversations));
+        await saveMessages(currentStory._id, rawMessages);
+      }
+    }
+
+    asyncFn();
+  }, 1000)
 
   useEffect(() => {
     const asyncFn = async () => {

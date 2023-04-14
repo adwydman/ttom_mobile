@@ -24,7 +24,7 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
   const roundedCompleted = completedPercentage >= 99 ? 100 : Math.round(completedPercentage);
 
   const windowWidth = Dimensions.get('window').width;
-  const panelWidth = windowWidth / 2.25
+  const panelWidth = windowWidth / 2.5;
   
   return (
     <Pressable key={story.name} onPress={() => {
@@ -44,7 +44,9 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
           <View style={style.unreadMessagesContainer}>
             {
               roundedCompleted === 100 ?
-                <Text style={style.unreadMessagesFont}>Story Completed!</Text> :
+                <View style={{ marginTop: 3}}>
+                  <Text style={style.unreadMessagesFont}>Story Completed!</Text>
+                </View> :
                 <>
                   <View style={style.unreadMessagesBackground}>
                     <Text style={style.unreadMessagesFont}>{displayedUnreadCount}</Text>
