@@ -11,7 +11,7 @@ import Text from 'components/Text'
 import { BubbleTail } from 'components/svgs';
 import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
-import { setRawMessages } from '../../stores';
+import { setRawMessages, setCurrentScreenName } from '../../stores';
 import {
   sendRequest,
   isMainCharacter,
@@ -133,6 +133,17 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     });
   }, [navigation, seenMessages]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      dispatch(setCurrentScreenName(screenTitle));
+    });
+
+    return () => {
+      dispatch(setCurrentScreenName(null));
+      unsubscribe();
+    };
+  }, [navigation, screenTitle]);
+
   const unseenMessages = [];
   const parsedMessages = [];
   // let firstUnreadMessage = false;
@@ -170,7 +181,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     lastType = type;
 
     const onChange = (isVisible: boolean) => {
-      console.log('message', message)
       setSeenMessages(new Set([...Array.from(seenMessages), conversation[i]._id])) 
     }
 
@@ -231,7 +241,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   }
 
   return (
-    <StoryFrame navigation={navigation} onBothPress={optimisticallyUpdateMessages}>
+    <StoryFrame navigation={navigation} onBothPress={optimisticallyUpdateMessages} route={route}>
       <IOScrollView
         ref={scrollViewRef}
         onLayout={() => {

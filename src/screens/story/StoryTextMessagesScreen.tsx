@@ -64,7 +64,7 @@ export default function StoryTextMessagesScreen({ navigation, route }: IScreenPr
   );
 
   return (
-    <StoryFrame navigation={navigation}>
+    <StoryFrame navigation={navigation} route={route}>
       {
         Object.keys(textMessages).map((contactName) => {
           const conversation = textMessages[contactName];

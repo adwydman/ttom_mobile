@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
@@ -10,10 +10,8 @@ import { IScreenProps } from '../../shared/apitypes';
 import Text from '../../components/Text'
 import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
-import { setTextMessages, setRawMessages } from '../../stores';
+import { setTextMessages, setRawMessages, setCurrentScreenName } from '../../stores';
 import { style } from './StoryHomeScreen.style';
-
-const refreshTime = 60 * 60 * 1000 // hour in miliseconds
 
 async function saveMessages(messageKey, messagesData) {
   const timestamp = new Date().getTime();
@@ -39,6 +37,10 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
+  const currentScreenName = useSelector((state: any) => state.storeSlice.currentScreenName);
+  // const [visibleMessages, setVisibleMessages] = useState([]);
+  const firstRun = useRef(true);
+  const visibleMessages = useRef([]);
 
   const fetchTextMessages = async () => {
     const [result] = await sendRequest(`/userStoryTextMessages?storyId=${currentStory._id}`, {
@@ -59,36 +61,39 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
 
   useEffect(() => {
     retrieveMessages();
-  }, []);  
+  }, []);
 
+  const handleMessages = useCallback(async () => {
+    if (rawMessages && currentStory) {
+      const [parsedConversations, totalAvailableMessages, newVisibleMessages] = generateAvailableConversations(rawMessages);
+
+      if (!firstRun.current) {
+        const numberOfNewMessages = newVisibleMessages.length - visibleMessages.current.length;
+        if (numberOfNewMessages > 0) {
+          const lastNewMessage = newVisibleMessages[newVisibleMessages.length - 1];
+          if (currentScreenName !== lastNewMessage.whoFrom) {
+            schedulePushNotification(lastNewMessage.whoFrom, lastNewMessage.message, { storyId: currentStory._id });
+          }
+        }
+      } else {
+        firstRun.current = false;
+      }
+
+      visibleMessages.current = newVisibleMessages;
+
+      setUnreadTextMessages(totalAvailableMessages);
+      dispatch(setTextMessages(parsedConversations));
+      await saveMessages(currentStory._id, rawMessages);
+    }
+  }, [rawMessages, currentStory, currentScreenName]);
+  
   useInterval(() => {
-    // retrieveMessages();
-    const asyncFn = async () => {
-      if (rawMessages && currentStory) {
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(rawMessages);
-    
-        setUnreadTextMessages(totalAvailableMessages);
-        dispatch(setTextMessages(parsedConversations));
-        await saveMessages(currentStory._id, rawMessages);
-      }
-    }
-
-    asyncFn();
-  }, 1000)
-
+    handleMessages();
+  }, 1000);
+  
   useEffect(() => {
-    const asyncFn = async () => {
-      if (rawMessages && currentStory) {
-        const [parsedConversations, totalAvailableMessages] = generateAvailableConversations(rawMessages);
-    
-        setUnreadTextMessages(totalAvailableMessages);
-        dispatch(setTextMessages(parsedConversations));
-        await saveMessages(currentStory._id, rawMessages);
-      }
-    }
-
-    asyncFn();
-  }, [rawMessages, currentStory]);
+    handleMessages();
+  }, [handleMessages]);;
 
   // I'm gonna have to fetch the story info from the backend
   // when the user gets a notification
@@ -160,7 +165,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   }
 
   return (
-    <StoryFrame navigation={navigation}>
+    <StoryFrame navigation={navigation} route={route}>
       <ImageBackground
         style={style.backgroundImage}
         source={{ uri: currentStory.picture }}

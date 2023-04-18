@@ -82,6 +82,8 @@ export const generateConversationClusters = (userStoryTextMessages) => {
       cluster.push(message);
     }
 
+    // cluster.push(message);
+
     previousContactName = contactName
 
     return acc;
@@ -93,11 +95,16 @@ export const generateAvailableConversations = (userStoryTextMessages) => {
 
   let totalAvailableMessages = 0;
   const parsedConversations = {};
+  let visibleMessages = []
   Object.keys(conversationClusters).forEach((contactName) => {
     const clusters = conversationClusters[contactName];
 
     const availableClusters = clusters.filter((c) => c.__canBeDisplayed__);
     const availableMessages = flatten(availableClusters);
+    visibleMessages = [
+      ...visibleMessages,
+      availableMessages,
+    ]
 
     if (availableMessages.length > 0) {
       const unreadMessagesCount = availableMessages.filter((m) => !m.seenByUser).length;
@@ -107,7 +114,9 @@ export const generateAvailableConversations = (userStoryTextMessages) => {
     }
   })
 
-  return [parsedConversations, totalAvailableMessages];
+  visibleMessages = flatten(visibleMessages);
+
+  return [parsedConversations, totalAvailableMessages, visibleMessages];
 }
 
 export const saveMessages = async (messageKey, messagesData) => {

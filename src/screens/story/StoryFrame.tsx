@@ -9,7 +9,7 @@ interface IProps extends IScreenProps {
   onBothPress?: any;
 }
  
-export default function StoryFrame({ navigation, children, footerStyle = {}, onBothPress = () => {} }: IProps) {
+export default function StoryFrame({ navigation, route, children, footerStyle = {}, onBothPress = () => {} }: IProps) {
   // todo: when storyhome button is clicked, the messages refetch needs to be triggered
   const iconSize = 24;
   return (

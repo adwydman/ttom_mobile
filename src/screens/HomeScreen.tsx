@@ -12,7 +12,7 @@ import Container from 'components/Container';
 import OwnedStory from 'components/OwnedStory';
 import LibraryStory from 'components/LibraryStory';
 import LibraryStorySkeleton from 'components/skeletons/LibraryStorySkeleton';
-import { setUser, setCurrentStory } from 'stores/index';
+import { setUser, setCurrentStory, setCurrentScreenName } from 'stores/index';
 
 const extras = [
   {
@@ -80,6 +80,7 @@ export default function HomeScreen({ navigation }: IScreenProps) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
+      dispatch(setCurrentScreenName(null));
       if (currentStory) {
         dispatch(setCurrentStory({}));
       }
@@ -152,7 +153,7 @@ export default function HomeScreen({ navigation }: IScreenProps) {
               <H1>Browse Stories</H1>
             </Container>
             {
-              // isFetchingStories && <LibraryStorySkeleton />
+              // !isFetchingStories && <LibraryStorySkeleton />
             }
             {
               displayableStories.length ? 
