@@ -82,8 +82,6 @@ export const generateConversationClusters = (userStoryTextMessages) => {
       cluster.push(message);
     }
 
-    // cluster.push(message);
-
     previousContactName = contactName
 
     return acc;
@@ -176,3 +174,17 @@ export const getShouldDisplayCenteredTimestamp = (i, conversation) => {
 }
 
 export const isImage = (message: string) => /\.(jpg|jpeg|png|gif)$/.test(message);
+
+export const isDateWithinLastMinute = (dateString: string) => {
+  // Parse the date string into a Date object
+  const date = new Date(dateString);
+
+  // Get the current date and time
+  const now = new Date();
+
+  // Calculate the difference between the current date and time and the given date
+  const differenceInMilliseconds = now.getTime() - date.getTime();
+
+  // Check if the difference is less than or equal to 60,000 milliseconds (1 minute)
+  return differenceInMilliseconds >= 0 && differenceInMilliseconds <= 60000;
+}

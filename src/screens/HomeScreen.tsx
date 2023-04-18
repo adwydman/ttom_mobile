@@ -68,14 +68,11 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
 
   Notifications.addNotificationResponseReceivedListener(response => {
-    const { contactName, story } = response.notification.request.content.data
+    const { contactName } = response.notification.request.content.data
 
-    console.log('here!')
-
-    // navigation.navigate('StoryConversation', {
-    //   screenTitle: contactName,
-    //   story: story,
-    // })
+    navigation.navigate('StoryConversation', {
+      screenTitle: contactName,
+    })
   });
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendRequest, useInterval, generateAvailableConversations } from 'utils/index';
+import { sendRequest, useInterval, generateAvailableConversations, isDateWithinLastMinute, isMainCharacter } from 'utils/index';
 import CatSteps from 'components/CatSteps';
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from '../../shared/apitypes';
@@ -71,8 +71,11 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
         const numberOfNewMessages = newVisibleMessages.length - visibleMessages.current.length;
         if (numberOfNewMessages > 0) {
           const lastNewMessage = newVisibleMessages[newVisibleMessages.length - 1];
-          if (currentScreenName !== lastNewMessage.whoFrom) {
-            schedulePushNotification(lastNewMessage.whoFrom, lastNewMessage.message, { storyId: currentStory._id });
+          if (currentScreenName !== lastNewMessage.whoFrom && isDateWithinLastMinute(lastNewMessage.enabledAt)) {
+            const contactName = isMainCharacter(lastNewMessage.whoFrom) ? lastNewMessage.whoTo : lastNewMessage.whoFrom;
+            const title = isMainCharacter(lastNewMessage.whoFrom) ? `Sent to ${contactName}` : contactName;
+            
+            schedulePushNotification(title, lastNewMessage.message, { contactName });
           }
         }
       } else {
