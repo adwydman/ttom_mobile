@@ -189,46 +189,46 @@ export const isDateWithinLastMinute = (dateString: string) => {
   return differenceInMilliseconds >= 0 && differenceInMilliseconds <= 60000;
 }
 
-const getAccessKey = (userId: string, storyId: string) => {
-  return `user_story_access_${userId}_${storyId}`;
-}
+const getAccessKey = (userId) => `user_story_access_${userId}`;
 
-export const saveAccessTimestamp = async (userId: string, storyId: string) => {
-  const accessKey = getAccessKey(userId, storyId);
+export const saveAccessTimestamp = async (userId, storyId) => {
+  const accessKey = getAccessKey(userId);
   const timestamp = new Date().toISOString();
   try {
-    await AsyncStorage.setItem(accessKey, timestamp);
+    const timestampsJSON = await AsyncStorage.getItem(accessKey);
+    const timestamps = timestampsJSON ? JSON.parse(timestampsJSON) : {};
+    timestamps[storyId] = timestamp;
+    await AsyncStorage.setItem(accessKey, JSON.stringify(timestamps));
   } catch (error) {
     console.error('Error saving access timestamp:', error);
   }
-}
+};
 
-export const getAccessTimestamp = async (userId: string, storyId: string) => {
-  const accessKey = getAccessKey(userId, storyId);
+export const getAccessTimestamps = async (userId) => {
+  const accessKey = getAccessKey(userId);
   try {
-    const timestamp = await AsyncStorage.getItem(accessKey);
-    return timestamp;
+    const timestampsJSON = await AsyncStorage.getItem(accessKey);
+    const timestamps = timestampsJSON ? JSON.parse(timestampsJSON) : {};
+    return timestamps;
   } catch (error) {
-    console.error('Error retrieving access timestamp:', error);
+    console.error('Error retrieving access timestamps:', error);
   }
-}
+};
 
-export const sortStoriesByAccess = async (userId: string, stories: any) => {
-  const storiesWithTimestamps = await Promise.all(
-    stories.map(async (story) => {
-      const timestamp = await getAccessTimestamp(userId, story._id);
-      console.log('story', story);
-      console.log('timestamp', timestamp)
-      return {
-        ...story,
-        accessTimestamp: timestamp,
-      };
-    }),
-  );
+export const sortStoriesByAccess = async (userId, stories) => {
+  const timestamps = await getAccessTimestamps(userId);
+
+  const storiesWithTimestamps = stories.map((story) => {
+    const timestamp = timestamps[story._id] || null;
+    return {
+      ...story,
+      accessTimestamp: timestamp,
+    };
+  });
 
   storiesWithTimestamps.sort((a, b) => {
     return new Date(b.accessTimestamp) - new Date(a.accessTimestamp);
   });
 
   return storiesWithTimestamps;
-}
+};
