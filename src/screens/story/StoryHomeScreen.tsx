@@ -10,7 +10,7 @@ import { IScreenProps } from '../../shared/apitypes';
 import Text from '../../components/Text'
 import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
-import { setTextMessages, setRawMessages } from '../../stores';
+import { setTextMessages, setRawMessages, setStoryPictures } from '../../stores';
 import { style } from './StoryHomeScreen.style';
 
 async function saveMessages(messageKey, messagesData) {
@@ -37,6 +37,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
+  const storyPictures = useSelector((state: any) => state.storeSlice.storyPictures);
   const currentScreenName = useSelector((state: any) => state.storeSlice.currentScreenName);
   // const [visibleMessages, setVisibleMessages] = useState([]);
   const firstRun = useRef(true);
@@ -49,8 +50,13 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
         'Authorization': `Bearer ${userToken}`,
       },
     });
-    const userStoryTextMessages = result.data;
+    const {
+      userStoryTextMessages,
+      userPictures
+    } = result;
+
     dispatch(setRawMessages(userStoryTextMessages));
+    dispatch(setStoryPictures(userPictures));
   }
 
   const retrieveMessages = async () => {
@@ -121,11 +127,12 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     //   imagePath: require('../../assets/images/icons/Email.png'),
     //   backgroundColor: colors.orange,
     // },
-    // {
-    //   name: 'Photos',
-    //   imagePath: require('../../assets/images/icons/Photos.png'),
-    //   backgroundColor: colors.lightBlue,
-    // },
+    ...(storyPictures.length ? [{
+        name: 'Photos',
+        imagePath: require('../../assets/images/icons/Photos.png'),
+        backgroundColor: colors.lightBlue,
+      }] : []
+    ),
     // {
     //   name: 'Map',
     //   imagePath: require('../../assets/images/icons/Map.png'),

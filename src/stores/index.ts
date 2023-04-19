@@ -8,7 +8,8 @@ export const initialState = {
   textMessages: [],
   user: {},
   rawMessages: null,
-  currentScreenName: null
+  currentScreenName: null,
+  storyPictures: []
 };
 
 export const storeSlice = createSlice({
@@ -38,6 +39,9 @@ export const storeSlice = createSlice({
     },
     setCurrentScreenName: (state, action) => {
       state.currentScreenName = action.payload;
+    },
+    setStoryPictures: (state, action) => {
+      state.storyPictures = action.payload;
     }
   },
 });
@@ -51,6 +55,7 @@ export const {
   setTextMessages,
   setRawMessages,
   setCurrentScreenName,
+  setStoryPictures,
 } = storeSlice.actions;
 
 export const rootStore = configureStore({
