@@ -10,7 +10,7 @@ import { IScreenProps } from '../../shared/apitypes';
 import Text from '../../components/Text'
 import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
-import { setTextMessages, setRawMessages, setCurrentScreenName } from '../../stores';
+import { setTextMessages, setRawMessages } from '../../stores';
 import { style } from './StoryHomeScreen.style';
 
 async function saveMessages(messageKey, messagesData) {

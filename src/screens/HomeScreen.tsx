@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import { IScreenProps } from '../shared/apitypes';
-import { sendRequest, noAvailableStoriesMessage } from 'utils/index';
+import { sendRequest, noAvailableStoriesMessage, sortStoriesByAccess } from 'utils/index';
 import { style } from './HomeScreen.style';
 import Text from '../components/Text';
 import { H1 } from 'components/Headers';
@@ -49,7 +49,8 @@ export function HomeHeader({navigation}) {
       <Pressable style={{ width: 40 }} onPress={() => { navigation.openDrawer() }}>
         <FontAwesome style={{ fontSize: 24 }} name={'user'} />
       </Pressable>
-      <FontAwesome style={{ fontSize: 24 }} name={'search'} />
+      {/* todo: comment this out for now */}
+      {/* <FontAwesome style={{ fontSize: 24 }} name={'search'} /> */}
     </View>
   );
 }
@@ -120,8 +121,10 @@ export default function HomeScreen({ navigation }: IScreenProps) {
       const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
       const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
   
+      const sortedPurchasedStories = await sortStoriesByAccess(user._id, userPurchasedStories);
+
       setDisplayableStories(filteredStories);
-      setPurchasedStories(userPurchasedStories);
+      setPurchasedStories(sortedPurchasedStories);
 
       setIsFetchingStories(false);
     };
@@ -137,7 +140,10 @@ export default function HomeScreen({ navigation }: IScreenProps) {
             {
               purchasedStories.length > 0 && <>
                 <Container>
-                  <H1>My Stories</H1>
+                  <H1>
+                    My Stories 
+                    <Text style={{fontSize: 20}}> ({purchasedStories.length})</Text>
+                  </H1>
                 </Container>
                 <FlatList
                   data={purchasedStories}

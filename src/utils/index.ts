@@ -188,3 +188,47 @@ export const isDateWithinLastMinute = (dateString: string) => {
   // Check if the difference is less than or equal to 60,000 milliseconds (1 minute)
   return differenceInMilliseconds >= 0 && differenceInMilliseconds <= 60000;
 }
+
+const getAccessKey = (userId: string, storyId: string) => {
+  return `user_story_access_${userId}_${storyId}`;
+}
+
+export const saveAccessTimestamp = async (userId: string, storyId: string) => {
+  const accessKey = getAccessKey(userId, storyId);
+  const timestamp = new Date().toISOString();
+  try {
+    await AsyncStorage.setItem(accessKey, timestamp);
+  } catch (error) {
+    console.error('Error saving access timestamp:', error);
+  }
+}
+
+export const getAccessTimestamp = async (userId: string, storyId: string) => {
+  const accessKey = getAccessKey(userId, storyId);
+  try {
+    const timestamp = await AsyncStorage.getItem(accessKey);
+    return timestamp;
+  } catch (error) {
+    console.error('Error retrieving access timestamp:', error);
+  }
+}
+
+export const sortStoriesByAccess = async (userId: string, stories: any) => {
+  const storiesWithTimestamps = await Promise.all(
+    stories.map(async (story) => {
+      const timestamp = await getAccessTimestamp(userId, story._id);
+      console.log('story', story);
+      console.log('timestamp', timestamp)
+      return {
+        ...story,
+        accessTimestamp: timestamp,
+      };
+    }),
+  );
+
+  storiesWithTimestamps.sort((a, b) => {
+    return new Date(b.accessTimestamp) - new Date(a.accessTimestamp);
+  });
+
+  return storiesWithTimestamps;
+}

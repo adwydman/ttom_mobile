@@ -8,7 +8,7 @@ import { H2 } from '../components/Headers';
 import Text from '../components/Text';
 import Button from '../components/Button';
 import StoryContainer from '../components/StoryContainer';
-import { sendRequest } from 'utils/index';
+import { sendRequest, saveAccessTimestamp } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
 import { setUser } from '../stores';
 import StoryImage from 'components/StoryImage';
@@ -74,7 +74,8 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     });
   };
 
-  const goToStory = () => {
+  const goToStory = async () => {
+    await saveAccessTimestamp(user._id, currentStory._id);
     navigation.navigate({
       name: 'StoryHome',
     });
