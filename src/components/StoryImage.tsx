@@ -15,7 +15,7 @@ interface IProps {
 export default function StoryImage({ story, style : propsStyle, panelWidth, storyTitleStyle = {}, storyAuthorStyle = {} }: IProps) {
   return (
     <ImageBackground
-      style={{ ...style.imageCover, ...propsStyle}}
+      style={{ ...style.storyImageCover, ...propsStyle}}
       source={{uri: story.picture}}
     >
       <LinearGradient

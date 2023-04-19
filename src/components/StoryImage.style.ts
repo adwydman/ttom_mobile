@@ -1,7 +1,7 @@
 import { colors } from '../colors';
 
 export const style = {
-  imageCover: {
+  storyImageCover: {
     flex: 1,
     justifyContent: 'flex-end',
     position: 'relative',

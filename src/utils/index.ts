@@ -232,3 +232,10 @@ export const sortStoriesByAccess = async (userId, stories) => {
 
   return storiesWithTimestamps;
 };
+
+export const convertTo12Hour = (time24: string) => {
+  const [hours, minutes] = time24.split(':');
+  const hours12 = (hours % 12) || 12;
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  return `${hours12}:${minutes} ${ampm}`;
+}

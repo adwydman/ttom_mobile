@@ -108,7 +108,8 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         'picture',
         'duration',
         'categories',
-        'description'
+        'description',
+        'mainCharacter',
       ]
     
       const [stories] = await sendRequest(`/stories?fields=${fetchedFields.join(',')}`, {

@@ -69,8 +69,8 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     }
     setLoadingAddToLibrary(false);
       
-    navigation.navigate({
-      name: 'ConfirmPurchase',
+    navigation.navigate('ConfirmPurchase', {
+      firstMessage: result.firstMessage,
     });
   };
 
