@@ -14,6 +14,8 @@ import ConfirmPurchaseScreen from 'screens/ConfirmPurchaseScreen';
 import StoryHomeScreen from 'screens/story/StoryHomeScreen';
 import StoryTextMessagesScreen from 'screens/story/StoryTextMessagesScreen';
 import StoryConversationScreen from 'screens/story/StoryConversationScreen';
+import StoryPhotosScreen from 'screens/story/StoryPhotosScreen';
+import StoryIndividualPhotoScreen from 'screens/story/StoryIndividualPhotoScreen';
 import LoadingSplash from './LoadingSplash';
 import { setUser, setUserToken } from '../stores';
 import { sendRequest } from 'utils/index';
@@ -103,6 +105,8 @@ export default function Navigator() {
             <Stack.Screen name="StoryHome" component={StoryHomeScreen} options={{ header: () => null }} />
             <Stack.Screen name="StoryMessages" component={StoryTextMessagesScreen} options={{ headerTitle: 'Messages' }} />
             <Stack.Screen name="StoryConversation" component={StoryConversationScreen} options={({ route }) => ({ title: route.params.screenTitle })} />
+            <Stack.Screen name="StoryPhotos" component={StoryPhotosScreen} options={() => ({ title: 'Photos' })} />
+            <Stack.Screen name="StoryIndividualPhoto" component={StoryIndividualPhotoScreen} options={() => ({ title: '' })} />
           </>
           :
           <>

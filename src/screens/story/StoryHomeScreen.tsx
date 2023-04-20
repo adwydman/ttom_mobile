@@ -10,7 +10,7 @@ import { IScreenProps } from '../../shared/apitypes';
 import Text from '../../components/Text'
 import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
-import { setTextMessages, setRawMessages, setStoryPictures } from '../../stores';
+import { setTextMessages, setRawMessages, setStoryPhotos } from '../../stores';
 import { style } from './StoryHomeScreen.style';
 
 async function saveMessages(messageKey, messagesData) {
@@ -31,13 +31,13 @@ async function schedulePushNotification(title, body, data) {
 }
 
 export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
-  const [unreadTextMessages, setUnreadTextMessages] = useState(0);
+  const [unreadTextMessagesCount, setUnreadTextMessagesCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
-  const storyPictures = useSelector((state: any) => state.storeSlice.storyPictures);
+  const storyPhotos = useSelector((state: any) => state.storeSlice.storyPhotos);
   const currentScreenName = useSelector((state: any) => state.storeSlice.currentScreenName);
   // const [visibleMessages, setVisibleMessages] = useState([]);
   const firstRun = useRef(true);
@@ -52,21 +52,31 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     });
     const {
       userStoryTextMessages,
-      userPictures
+      userPhotos
     } = result;
 
     dispatch(setRawMessages(userStoryTextMessages));
-    dispatch(setStoryPictures(userPictures));
+    dispatch(setStoryPhotos(userPhotos));
   }
 
   const retrieveMessages = async () => {
-    setLoading(true);
     await fetchTextMessages();
-    setLoading(false);
+  };
+
+  const prefetchImages = async () => {
+    const loadImages = storyPhotos.map(image => Image.prefetch(image.url));
+    await Promise.all(loadImages);
   };
 
   useEffect(() => {
-    retrieveMessages();
+    const asyncFn = async () => {
+      setLoading(true);
+      await retrieveMessages();
+      await prefetchImages();
+      setLoading(false);
+    }
+
+    asyncFn();
   }, []);
 
   const handleMessages = useCallback(async () => {
@@ -90,7 +100,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
 
       visibleMessages.current = newVisibleMessages;
 
-      setUnreadTextMessages(totalAvailableMessages);
+      setUnreadTextMessagesCount(totalAvailableMessages);
       dispatch(setTextMessages(parsedConversations));
       await saveMessages(currentStory._id, rawMessages);
     }
@@ -115,11 +125,9 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
       name: 'Messages',
       imagePath: require('../../assets/images/icons/Message.png'),
       backgroundColor: colors.blue,
-      unreadTextMessages: unreadTextMessages,
+      notificationCount: unreadTextMessagesCount,
       onPress: () => {
-        navigation.navigate({
-          name: 'StoryMessages',
-        })
+        navigation.navigate('StoryMessages')
       }
     },
     // {
@@ -127,10 +135,13 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     //   imagePath: require('../../assets/images/icons/Email.png'),
     //   backgroundColor: colors.orange,
     // },
-    ...(storyPictures.length ? [{
+    ...(storyPhotos.length ? [{
         name: 'Photos',
         imagePath: require('../../assets/images/icons/Photos.png'),
         backgroundColor: colors.lightBlue,
+        onPress: () => {
+          navigation.navigate('StoryPhotos');
+        }
       }] : []
     ),
     // {
@@ -191,11 +202,11 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
                   <Image style={style.icon} source={item.imagePath}/>
 
                   {
-                    Boolean(unreadTextMessages) &&
+                    Boolean(item.notificationCount) &&
                     <>
                       <CatSteps catStepsStyle={{ bottom: -65 }} style={{ transform: [ { rotate: '335deg'} ] }}/>
                       <View style={style.notification}>
-                        <Text style={style.notificationText}>{item.unreadTextMessages}</Text>
+                        <Text style={style.notificationText}>{item.notificationCount}</Text>
                       </View>
                     </>
                   }
