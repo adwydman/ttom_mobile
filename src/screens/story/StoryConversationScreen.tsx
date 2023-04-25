@@ -1,5 +1,5 @@
 import { View, Pressable, Image } from 'react-native';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IOScrollView, InView } from 'react-native-intersection-observer'
 import { HeaderBackButton } from '@react-navigation/elements'
@@ -20,36 +20,21 @@ import {
   isImage
 } from 'utils/index';
 
-
-export function useTimeout(callback, delay) {
-  const timeoutRef = useRef(null);
-  const savedCallback = useRef(callback);
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-  useEffect(() => {
-    const tick = () => savedCallback.current();
-    if (typeof delay === 'number') {
-      timeoutRef.current = window.setTimeout(tick, delay);
-      return () => window.clearTimeout(timeoutRef.current);
-    }
-  }, [delay]);
-  return timeoutRef;
-};
-
-let timeout = null;
-
 interface IMessageProps {
   type: 'left' | 'right';
   children: string;
   timestamp?: any;
   extraStyles?: any;
   shouldShowTail: boolean;
+  conversation: any;
+  previousMessage: any;
 }
 
-function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail }: IMessageProps) {
+function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail, conversation, previousMessage }: IMessageProps) {
   const tailFill = type === 'left' ? colors.white : colors.blue
   const [showTimestamp, setShowTimestamp] = useState(false);
+
+  const shouldShowNameInGroupChat = (type === 'left') && (conversation.whoTo.split(';').length > 1) && (previousMessage === undefined || previousMessage.whoFrom !== conversation.whoFrom)
 
   return (
     <Pressable
@@ -58,6 +43,15 @@ function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail }
         setShowTimestamp(!showTimestamp);
       }}
     >
+      {
+        shouldShowNameInGroupChat && (
+          <View style={{ marginLeft: 16, marginBottom: 2, marginTop: 8 }}>
+            <Text>
+              {conversation.whoFrom}
+            </Text>
+          </View>
+        ) 
+      }
       <View>
         <View style={{...style.bubble, ...style[type], ...extraStyles}}>
           {
@@ -233,6 +227,8 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           extraStyles={extraStyles}
           shouldShowTail={shouldShowTail}
           timestamp={fullTimestamp}
+          conversation={conversation[i]}
+          previousMessage={conversation[i - 1]}
         >
           {message}
         </Message>

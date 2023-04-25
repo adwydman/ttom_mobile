@@ -53,7 +53,16 @@ export const isMainCharacter = (storyCharacter: string) => {
 export const generateConversationClusters = (userStoryTextMessages) => {
   let previousContactName = null;
   return userStoryTextMessages.reduce((acc, message, index, array) => {
-    const contactName = isMainCharacter(message.whoFrom) ? message.whoTo : message.whoFrom;
+    const whoToSeparated = message.whoTo.split(';');
+
+    let contactName = '';
+ 
+    if (whoToSeparated.length === 1) {
+      contactName = isMainCharacter(message.whoFrom) ? message.whoTo : message.whoFrom;
+    } else {
+      contactName = whoToSeparated.join(', ');
+    }
+
 
     if (!acc[contactName]) {
       acc[contactName] = [];
@@ -77,10 +86,12 @@ export const generateConversationClusters = (userStoryTextMessages) => {
       cluster = conversation[conversation.length - 1];
     }
 
-    const now = new Date();
-    if (new Date(message.enabledAt) <= now) {
-      cluster.push(message);
-    }
+    // const now = new Date();
+    // if (new Date(message.enabledAt) <= now) {
+    //   cluster.push(message);
+    // }
+
+    cluster.push(message);
 
     previousContactName = contactName
 
