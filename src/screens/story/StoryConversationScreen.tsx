@@ -1,6 +1,7 @@
 import { View, Pressable, Image } from 'react-native';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Bubble, GiftedChat } from 'react-native-gifted-chat'
 import { IOScrollView, InView } from 'react-native-intersection-observer'
 import { HeaderBackButton } from '@react-navigation/elements'
 import { cloneDeep } from 'lodash';
@@ -73,6 +74,7 @@ function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail, 
 export default function StoryConversationScreen({ navigation, route }: IScreenProps) {
   const dispatch = useDispatch();
   const { screenTitle } = route.params;
+  const giftedChatRef = useRef(null);
   const scrollViewRef = useRef(null);
   const firstUnreadMessage = useRef(false);
   const [seenMessages, setSeenMessages] = useState(new Set());
@@ -81,6 +83,8 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const conversation = textMessages[screenTitle];
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
 
   const optimisticallyUpdateMessages = useCallback(async () => {
     const newRawMessages = rawMessages.map((message) => {
@@ -236,14 +240,130 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     return parsedMessages;
   }, [conversation, seenMessages])
 
+  // useEffect(() => {
+  //   let cutOff = 0;
+  //   if (isLoaded) {
+  //     setTimeout(() => {
+  //       const giftedMessages = [];
+  //       for (let i = conversation.length - 1; i >= 0; i--) {
+  //         const message = conversation[i];
+      
+  //         giftedMessages.push(
+  //           {
+  //             _id: message._id,
+  //             text: message.message,
+  //             createdAt: new Date(message.enabledAt),
+  //             user: {
+  //               _id: isMainCharacter(message.whoFrom) ? 1 : 2,
+  //               name: message.whoFrom
+  //             }
+  //           }
+  //         )
+  //       }
+  //       setChatMessages(giftedMessages);
+  //     }, 3000)
+  //   } else {
+  //     const giftedMessages = [];
+  //     for (let i = conversation.length - 20; i >= 0; i--) {
+  //       const message = conversation[i];
+    
+  //       giftedMessages.push(
+  //         {
+  //           _id: message._id,
+  //           text: message.message,
+  //           createdAt: new Date(message.enabledAt),
+  //           user: {
+  //             _id: isMainCharacter(message.whoFrom) ? 1 : 2,
+  //             name: message.whoFrom
+  //           }
+  //         }
+  //       )
+  //     }
+  //     setChatMessages(giftedMessages);
+  //   }
+
+  // }, [isLoaded]);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     giftedChatRef.current?._messageContainerRef?.current?.scrollToIndex({
+  //       animated: true,
+  //       index: 7,
+  //     });
+  //   })
+  // }, [giftedChatRef.current?._messageContainerRef?.current])
+
+  // const scrollToIndexFailed = (info) => {
+  //   console.log('info', info)
+  //   const offset = info.averageItemLength * info.index;
+  //   giftedChatRef.current?._messageContainerRef?.current.scrollToOffset({ offset });
+  //   setTimeout(() => {
+  //     giftedChatRef.current?._messageContainerRef?.current.scrollToIndex({
+  //       index: info.index,
+  //       animated: true,
+  //       viewPosition: 0.5,
+  //     });
+  //   }, 100);
+  // };
+
+  const giftedMessages = [];
+  for (let i = 0; i < conversation.length; i++) {
+    // for (let i = conversation.length - 1; i >= 0; i--) {
+    const message = conversation[i];
+
+    giftedMessages.push(
+      {
+        _id: message._id,
+        text: message.message,
+        createdAt: new Date(message.enabledAt),
+        user: {
+          _id: isMainCharacter(message.whoFrom) ? 1 : 2,
+          name: message.whoFrom
+        }
+      }
+    )
+  }
+
   return (
     <StoryFrame navigation={navigation} onBothPress={optimisticallyUpdateMessages} route={route}>
-      <IOScrollView
+      <View style={{ height: '100%', width: '100%'}}>
+        <GiftedChat
+          ref={giftedChatRef}
+          messages={giftedMessages}
+          renderInputToolbar={() => null}
+          renderAvatar={null}
+          listViewProps={{
+            inverted: false,
+            initialScrollIndex: 15,
+            onLayout: () => {
+              console.log('here')
+              setIsLoaded(true);
+            }
+          }}
+          renderBubble={props => {
+            return(
+            <Bubble
+              {...props}
+              wrapperStyle={{
+                left: {
+                  backgroundColor: colors.white,
+                },
+                right: {
+                  backgroundColor: colors.blue,
+                },
+              }}
+            />
+          )}}
+          user={{ _id: 1, }}
+          scrollToBottom={false}
+        />
+      </View>
+      {/* <IOScrollView
         ref={scrollViewRef}
         onLayout={scrollOnLoad}
       >
         { parsedMessages }
-      </IOScrollView>
+      </IOScrollView> */}
     </StoryFrame>
   )
 }
