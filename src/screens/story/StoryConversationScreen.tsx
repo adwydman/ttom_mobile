@@ -80,36 +80,37 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
+  const startingIndex = useSelector((state: any) => state.storeSlice.startingIndex);
   const conversation = textMessages[screenTitle];
 
   const optimisticallyUpdateMessages = useCallback(async () => {
-    const newRawMessages = rawMessages.map((message) => {
-      let parsedMessage = message;
-      if (seenMessages.has(message._id)) {
-        parsedMessage = cloneDeep(message);
-        parsedMessage.seenByUser = true;
-      }
+    // const newRawMessages = rawMessages.map((message) => {
+    //   let parsedMessage = message;
+    //   if (seenMessages.has(message._id)) {
+    //     parsedMessage = cloneDeep(message);
+    //     parsedMessage.seenByUser = true;
+    //   }
 
-      return parsedMessage;
-    })
+    //   return parsedMessage;
+    // })
 
-    dispatch(setRawMessages(newRawMessages));
+    // dispatch(setRawMessages(newRawMessages));
 
-    sendRequest('/userStoryTextMessages', {
-      method: 'PUT',
-      body: JSON.stringify({
-        storyId: currentStory._id,
-        conversationIds: Array.from(seenMessages),
-        seenByUser: true,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userToken}`,
-      },
-    })
-    .catch(() => {
-      dispatch(setRawMessages(rawMessages));
-    })
+    // sendRequest('/userStoryTextMessages', {
+    //   method: 'PUT',
+    //   body: JSON.stringify({
+    //     storyId: currentStory._id,
+    //     conversationIds: Array.from(seenMessages),
+    //     seenByUser: true,
+    //   }),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${userToken}`,
+    //   },
+    // })
+    // .catch(() => {
+    //   dispatch(setRawMessages(rawMessages));
+    // })
   }, [dispatch, rawMessages, seenMessages, userToken, currentStory]);
 
   useEffect(() => {
@@ -145,7 +146,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     let firstUnreadMessage2 = null;
     let lastType: string|null = null;
   
-    for (let i = 0; i < conversation.length; i++) {
+    for (let i = startingIndex; i < conversation.length; i++) {
       const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
       const type = isMainCharacter(whoFrom) ? 'right' : 'left';
       let shouldShowTail = true;

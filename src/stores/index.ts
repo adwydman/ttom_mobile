@@ -9,7 +9,8 @@ export const initialState = {
   user: {},
   rawMessages: null,
   currentScreenName: null,
-  storyPhotos: []
+  storyPhotos: [],
+  startingIndex: 0,
 };
 
 export const storeSlice = createSlice({
@@ -42,6 +43,9 @@ export const storeSlice = createSlice({
     },
     setStoryPhotos: (state, action) => {
       state.storyPhotos = action.payload;
+    },
+    setStartingIndex: (state, action) => {
+      state.startingIndex = action.payload;
     }
   },
 });
@@ -56,6 +60,7 @@ export const {
   setRawMessages,
   setCurrentScreenName,
   setStoryPhotos,
+  setStartingIndex,
 } = storeSlice.actions;
 
 export const rootStore = configureStore({
