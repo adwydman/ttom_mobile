@@ -10,7 +10,7 @@ import { IScreenProps } from '../../shared/apitypes';
 import Text from '../../components/Text'
 import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
-import { setTextMessages, setRawMessages, setStoryPhotos, setStartingIndex } from '../../stores';
+import { setTextMessages, setRawMessages, setStoryPhotos } from '../../stores';
 import { style } from './StoryHomeScreen.style';
 
 async function saveMessages(messageKey, messagesData) {
@@ -79,24 +79,6 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     asyncFn();
   }, []);
 
-  useEffect(() => {
-    if (rawMessages) {
-      let startingIndex = 0;
-      for (let i = 0; i < rawMessages.length; i++) {
-        const message = rawMessages[i];
-        if (!message.seenByUser) {
-          startingIndex = i - 15;
-          if (startingIndex < 0) {
-            startingIndex = 0;
-          }
-          break;
-        }
-      }
-
-      dispatch(setStartingIndex(startingIndex));
-    }
-  }, []);
-
   const handleMessages = useCallback(async () => {
     if (rawMessages && currentStory) {
       const [parsedConversations, totalAvailableMessages, newVisibleMessages] = generateAvailableConversations(rawMessages);
@@ -122,7 +104,7 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
       dispatch(setTextMessages(parsedConversations));
 
 
-      await saveMessages(currentStory._id, rawMessages);
+      // await saveMessages(currentStory._id, rawMessages);
     }
   }, [rawMessages, currentStory, currentScreenName]);
   

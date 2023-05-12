@@ -13,11 +13,12 @@ import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
 import { setRawMessages, setCurrentScreenName } from '../../stores';
 import {
+  isImage,
   sendRequest,
   isMainCharacter,
   getMessageTimestamp,
+  getConversationStartingIndex,
   getShouldDisplayCenteredTimestamp,
-  isImage
 } from 'utils/index';
 
 interface IMessageProps {
@@ -75,12 +76,14 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const { screenTitle } = route.params;
   const scrollViewRef = useRef(null);
   const firstUnreadMessage = useRef(false);
+  const scrolledOnLoad = useRef(false);
   const [seenMessages, setSeenMessages] = useState(new Set());
   const textMessages = useSelector((state: any) => state.storeSlice.textMessages);
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
-  const startingIndex = useSelector((state: any) => state.storeSlice.startingIndex);
+  const [startingIndex, setStartingIndex] = useState(() => getConversationStartingIndex(rawMessages))
+  const [oldStartingIndex, setOldStartingIndex] = useState(0);
   const conversation = textMessages[screenTitle];
 
   const optimisticallyUpdateMessages = useCallback(async () => {
@@ -135,15 +138,20 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     };
   }, [navigation, screenTitle]);
 
-  const scrollOnLoad = useCallback(() => {
-    if (firstUnreadMessage.current === false && scrollViewRef.current) {
+  const scrollOnLoad = () => {
+    if (
+      firstUnreadMessage.current === false && 
+      scrollViewRef.current && 
+      scrolledOnLoad.current === false
+    ) {
       scrollViewRef.current.scrollTo({ x: 0, y: 999999, animated: false})
     }
-  }, [scrollViewRef, firstUnreadMessage]);
+  }
 
   const parsedMessages = useMemo(() => {
     const parsedMessages = [];
     let firstUnreadMessage2 = null;
+    let scrollToMessageWhenLazyLoading = null;
     let lastType: string|null = null;
   
     for (let i = startingIndex; i < conversation.length; i++) {
@@ -189,6 +197,10 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           </View>
         );
       }
+
+      if (oldStartingIndex !== startingIndex && i === oldStartingIndex) {
+        scrollToMessageWhenLazyLoading = message;
+      }
   
       if (shouldDisplayCenteredTimestamp) {
         parsedMessages.push(
@@ -207,14 +219,26 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           style={wrapperStyle}
           onLayout={(event) => {
             if (message === firstUnreadMessage2) {
-              if (scrollViewRef.current) {
+              if (scrollViewRef.current && scrolledOnLoad.current === false) {
+                console.log('scroll to unread')
                 firstUnreadMessage.current = true;
   
                 let offset = 40;
                 if (shouldDisplayCenteredTimestamp) {
                   offset = 80;
                 }
+                scrolledOnLoad.current = true
+                scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y - offset, animated: false})
+              }
+            } else if (message === scrollToMessageWhenLazyLoading) {
+              if (scrollViewRef.current) {
+                console.log('scroll to message when lazy loading')
+                firstUnreadMessage.current = true;
   
+                let offset = 40;
+                if (shouldDisplayCenteredTimestamp) {
+                  offset = 80;
+                }
                 scrollViewRef.current.scrollTo({ x: 0, y: event.nativeEvent.layout.y - offset, animated: false})
               }
             }
@@ -235,13 +259,35 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     }
 
     return parsedMessages;
-  }, [conversation, seenMessages])
+  }, [conversation, seenMessages, startingIndex])
+
+  const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}: any) => {
+    const paddingToBottom = 20;
+    return layoutMeasurement.height + contentOffset.y >=
+      contentSize.height - paddingToBottom;
+  };
+
+  const isCloseToTop = ({contentOffset}: any) => {
+    const paddingToTop = 20;
+    return contentOffset.y <= paddingToTop;
+
+  };
 
   return (
     <StoryFrame navigation={navigation} onBothPress={optimisticallyUpdateMessages} route={route}>
       <IOScrollView
         ref={scrollViewRef}
         onLayout={scrollOnLoad}
+        onScrollEndDrag={({nativeEvent}) => {
+          if (isCloseToBottom(nativeEvent)) {
+            console.log('bottom?')
+          }
+          if (isCloseToTop(nativeEvent)) {
+            console.log('top?');
+            setStartingIndex(startingIndex - 20);
+            setOldStartingIndex(startingIndex)
+          }
+        }}
       >
         { parsedMessages }
       </IOScrollView>

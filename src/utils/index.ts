@@ -129,13 +129,13 @@ export const generateAvailableConversations = (userStoryTextMessages) => {
 }
 
 export const saveMessages = async (messageKey, messagesData) => {
-  const timestamp = new Date().getTime();
-  const keyWithTimestamp = `messages_${messageKey}_${timestamp}`;
-  try {
-    await AsyncStorage.setItem(keyWithTimestamp, JSON.stringify(messagesData));
-  } catch (error) {
-    console.error('Error saving message:', error);
-  }
+  // const timestamp = new Date().getTime();
+  // const keyWithTimestamp = `messages_${messageKey}_${timestamp}`;
+  // try {
+  //   await AsyncStorage.setItem(keyWithTimestamp, JSON.stringify(messagesData));
+  // } catch (error) {
+  //   console.error('Error saving message:', error);
+  // }
 }
 
 const offset = moment().utcOffset();
@@ -249,4 +249,20 @@ export const convertTo12Hour = (time24: string) => {
   const hours12 = (hours % 12) || 12;
   const ampm = hours >= 12 ? 'PM' : 'AM';
   return `${hours12}:${minutes} ${ampm}`;
+}
+
+export const getConversationStartingIndex = (rawMessages) => {
+  let startingIndex = 0;
+    for (let i = 0; i < rawMessages.length; i++) {
+      const message = rawMessages[i];
+      if (!message.seenByUser) {
+        startingIndex = i - 15;
+        if (startingIndex < 0) {
+          startingIndex = 0;
+        }
+        break;
+      }
+    }
+    
+    return startingIndex;
 }

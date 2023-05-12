@@ -10,7 +10,6 @@ export const initialState = {
   rawMessages: null,
   currentScreenName: null,
   storyPhotos: [],
-  startingIndex: 0,
 };
 
 export const storeSlice = createSlice({
@@ -44,9 +43,6 @@ export const storeSlice = createSlice({
     setStoryPhotos: (state, action) => {
       state.storyPhotos = action.payload;
     },
-    setStartingIndex: (state, action) => {
-      state.startingIndex = action.payload;
-    }
   },
 });
 
@@ -60,11 +56,14 @@ export const {
   setRawMessages,
   setCurrentScreenName,
   setStoryPhotos,
-  setStartingIndex,
 } = storeSlice.actions;
 
 export const rootStore = configureStore({
   reducer: {
     storeSlice: storeSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    immutableCheck: { warnAfter: 128 },
+    serializableCheck: { warnAfter: 128 },
+  })
 });
