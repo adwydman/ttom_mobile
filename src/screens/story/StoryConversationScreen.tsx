@@ -3,8 +3,6 @@ import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { IOScrollView, InView } from 'react-native-intersection-observer'
 import { HeaderBackButton } from '@react-navigation/elements'
-import { cloneDeep } from 'lodash';
-
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from 'shared/apitypes';
 import Text from 'components/Text'
@@ -152,15 +150,17 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     const parsedMessages = [];
     let firstUnreadMessage2 = null;
     let scrollToMessageWhenLazyLoading = null;
+    const conversationLength = conversation.length;
+    let nextConversationItem = conversation[startingIndex + 1];
     let lastType: string|null = null;
   
-    for (let i = startingIndex; i < conversation.length; i++) {
+    for (let i = startingIndex; i < conversationLength; i++) {
       const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
       const type = isMainCharacter(whoFrom) ? 'right' : 'left';
       let shouldShowTail = true;
-  
-      if (i < conversation.length - 1) {
-        const nextMessageType = isMainCharacter(conversation[i + 1].whoFrom) ? 'right' : 'left';
+
+      if (nextConversationItem) {
+        const nextMessageType = isMainCharacter(nextConversationItem.whoFrom) ? 'right' : 'left';
         if (nextMessageType === type) {
           shouldShowTail = false;
         }
@@ -181,7 +181,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
       lastType = type;
   
       const onChange = (isVisible: boolean) => {
-        setSeenMessages(new Set([...Array.from(seenMessages), _id])) 
+        setSeenMessages(prevState => new Set(prevState).add(_id));
       }
   
       const fullTimestamp = getMessageTimestamp(enabledAt);
@@ -214,7 +214,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   
       parsedMessages.push(
         <InView
-          key={i}
+          key={_id}
           onChange={onChange}
           style={wrapperStyle}
           onLayout={(event) => {
@@ -256,6 +256,12 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           </Message>
         </InView>
       );
+
+      if (i + 1 < conversationLength) {
+        nextConversationItem = conversation[i + 1];
+      } else {
+        nextConversationItem = null;
+      }
     }
 
     return parsedMessages;
