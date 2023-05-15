@@ -7,7 +7,8 @@ import {
 import { Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
-import HomeScreen, { HomeHeader } from 'screens/HomeScreen';
+import HomeScreen from 'screens/HomeScreen';
+import HomeHeader from 'screens/HomeHeader';
 import Text from 'components/Text';
 import Container from 'components/Container'
 import { setUser, setUserToken } from '../stores';
@@ -17,6 +18,10 @@ const Drawer = createDrawerNavigator();
 function CustomDrawerContent(props) {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
+
+  if (!user) {
+    return null;
+  }
 
   const onLogoutPress = () => {
     Alert.alert('Log out', 'Are you sure you want to log out?', [

@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import * as Notifications from 'expo-notifications';
 import Navigator from 'components/Navigator';
 import { rootStore } from './src/stores';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -34,6 +35,8 @@ async function schedulePushNotification(title, body, data) {
   });
 }
 
+const queryClient = new QueryClient();
+
 function App() {
   useEffect(() => {
     requestPermissionsAsync()
@@ -41,7 +44,9 @@ function App() {
 
   return (
     <Provider store={rootStore}>
-      <Navigator />
+      <QueryClientProvider client={queryClient}>
+        <Navigator />
+      </QueryClientProvider>
     </Provider>
   );
 }

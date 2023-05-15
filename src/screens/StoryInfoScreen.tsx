@@ -12,33 +12,28 @@ import { sendRequest, saveAccessTimestamp } from 'utils/index';
 import { style } from './StoryInfoScreen.style';
 import { setUser } from '../stores';
 import StoryImage from 'components/StoryImage';
+import useRequest from 'utils/hooks/useRequest';
 
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
-  const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
   const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
   const [loadingAddToLibrary, setLoadingAddToLibrary] = useState(false);
-  const [fullStory, setFullStory] = useState(currentStory)
 
   const windowWidth = Dimensions.get('window').width;
 
-  useEffect(() => {
-    const asyncFn = async () => {
-      const [story] = await sendRequest(`/stories/${currentStory._id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${userToken}`,
-        },
-      });
+  const storyQuery = useRequest({
+    queryKey: ['stories', currentStory._id],
+    url: `/stories/${currentStory._id}`,
+  })
 
-      setFullStory(story);
-    }
-
-    asyncFn();
-  }, []);
+  const addStoryToUser: any = useRequest({
+    url: '/userStoryTextMessages',
+    method: 'POST',
+    body: { storyId: currentStory._id },
+  })
 
   useEffect(() => {
     if (user.stories.includes(currentStory._id)) {
@@ -48,30 +43,23 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: () => <Text>{currentStory.name}</Text>
+      headerTitle: () => <Text style={{ fontSize: 20}}>{currentStory.name}</Text>
     });
   }, [navigation, route]);
 
+  useEffect(() => {
+    if (addStoryToUser.data) {
+      dispatch(setUser(addStoryToUser.data.user));
+      navigation.navigate('ConfirmPurchase', {
+        firstMessage: addStoryToUser.data.firstMessage,
+      });
+    }
+  }, [addStoryToUser.data])
+
   const addToLibrary = async () => {
     setLoadingAddToLibrary(true);
-    const [result] = await sendRequest('/userStoryTextMessages', {
-      method: 'POST',
-      body: JSON.stringify({
-        storyId: currentStory._id
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userToken}`,
-      },
-    })
-    if (result.user) {
-      dispatch(setUser(result.user));
-    }
+    await addStoryToUser.mutateAsync();
     setLoadingAddToLibrary(false);
-      
-    navigation.navigate('ConfirmPurchase', {
-      firstMessage: result.firstMessage,
-    });
   };
 
   const goToStory = async () => {
@@ -81,11 +69,13 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
     });
   }
 
+  const story = storyQuery.data || currentStory;
+
   return (
     <ScrollView style={{ backgroundColor: '#f7f7f8' }}>
       <View style={{ width: '100%', height: windowWidth }}>
         <StoryImage
-          story={fullStory}
+          story={story}
           panelWidth={windowWidth}
           storyTitleStyle={{ fontSize: 32, fontFamily: 'Niveau_smallCaps' }}
           storyAuthorStyle={{ fontSize: 26, fontFamily: 'Niveau_smallCaps' }}
@@ -110,7 +100,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
             {
               showConfirmAddToLibrary &&
               <View>
-                <Text style={{ marginTop: 16 }}>Add {fullStory.name} to your library for $0.00?</Text>
+                <Text style={{ marginTop: 16 }}>Add {story.name} to your library for $0.00?</Text>
                 <View style={{ flex: 1, justifyContent: 'space-between', flexDirection: 'row' }}>
                   <Button type={'empty'} buttonStyle={{flex:1, marginTop: 8, marginBottom: 24, marginRight: 8}} onPress={() => setShowConfirmAddToLibrary(false)}>
                     Nope
@@ -138,7 +128,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
         <Container>
           <H2>Summary</H2>
           <Text>
-            {fullStory.description}
+            {story.description}
           </Text>
         </Container>
       </StoryContainer>

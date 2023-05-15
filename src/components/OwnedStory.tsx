@@ -15,6 +15,12 @@ export default function OwnedStory({ story, navigation }: IOwnedStory) {
   const dispatch = useDispatch();
 
   const user = useSelector((state: any) => state.storeSlice.user);
+  // console.log('ownerstory user', user)
+  if (!user) {
+    // console.log('user.email', user.email)
+    return null;
+  }
+
   const storyInfo = user.storyInfo.find(({ storyId }) => storyId === story._id)
 
   const unreadMessagesCount = storyInfo.availableMessagesCount - storyInfo.seenMessagesCount;

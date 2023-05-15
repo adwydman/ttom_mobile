@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { View, ImageBackground, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendRequest, useInterval, generateAvailableConversations, isDateWithinLastMinute, isMainCharacter } from 'utils/index';
+import { useInterval, generateAvailableConversations, isDateWithinLastMinute, isMainCharacter } from 'utils/index';
 import CatSteps from 'components/CatSteps';
 import StoryFrame from './StoryFrame';
 import { IScreenProps } from '../../shared/apitypes';
@@ -12,6 +12,7 @@ import LoadingSplash from 'components/LoadingSplash';
 import { colors } from '../../colors'
 import { setTextMessages, setRawMessages, setStoryPhotos } from '../../stores';
 import { style } from './StoryHomeScreen.style';
+import useRequest from 'utils/hooks/useRequest';
 
 async function saveMessages(messageKey, messagesData) {
   const timestamp = new Date().getTime();
@@ -32,52 +33,21 @@ async function schedulePushNotification(title, body, data) {
 
 export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
   const [unreadTextMessagesCount, setUnreadTextMessagesCount] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
   const rawMessages = useSelector((state: any) => state.storeSlice.rawMessages);
   const storyPhotos = useSelector((state: any) => state.storeSlice.storyPhotos);
   const currentScreenName = useSelector((state: any) => state.storeSlice.currentScreenName);
+
   // const [visibleMessages, setVisibleMessages] = useState([]);
   const firstRun = useRef(true);
   const visibleMessages = useRef([]);
-
-  const fetchTextMessages = async () => {
-    const [result] = await sendRequest(`/userStoryTextMessages?storyId=${currentStory._id}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${userToken}`,
-      },
-    });
-    const {
-      userStoryTextMessages,
-      userPhotos
-    } = result;
-
-    dispatch(setRawMessages(userStoryTextMessages));
-    dispatch(setStoryPhotos(userPhotos));
-  }
-
-  const retrieveMessages = async () => {
-    await fetchTextMessages();
-  };
 
   const prefetchImages = async () => {
     const loadImages = storyPhotos.map(image => Image.prefetch(image.url));
     await Promise.all(loadImages);
   };
-
-  useEffect(() => {
-    const asyncFn = async () => {
-      setLoading(true);
-      await retrieveMessages();
-      await prefetchImages();
-      setLoading(false);
-    }
-
-    asyncFn();
-  }, []);
 
   const handleMessages = useCallback(async () => {
     if (rawMessages && currentStory) {
@@ -108,13 +78,30 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     }
   }, [rawMessages, currentStory, currentScreenName]);
   
-  useInterval(() => {
-    handleMessages();
-  }, 1000);
+  // useInterval(() => {
+  //   handleMessages();
+  // }, 1000);
   
   useEffect(() => {
     handleMessages();
   }, [handleMessages]);;
+
+  useRequest({
+    queryKey: ['userStoryTextMessages', currentStory._id],
+    url: `/userStoryTextMessages?storyId=${currentStory._id}`,
+    onSuccess: async (result) => {
+      const {
+        userStoryTextMessages,
+        userPhotos
+      } = result;
+
+      dispatch(setRawMessages(userStoryTextMessages));
+      dispatch(setStoryPhotos(userPhotos));
+
+      await prefetchImages();
+      setLoading(false);
+    }
+  });
 
   // I'm gonna have to fetch the story info from the backend
   // when the user gets a notification

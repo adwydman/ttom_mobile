@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeDrawer from 'drawers/HomeDrawer';
 import LoginScreen from 'screens/LoginScreen';
 import SplashScreen from 'screens/SplashScreen';
@@ -17,34 +16,10 @@ import StoryConversationScreen from 'screens/story/StoryConversationScreen';
 import StoryPhotosScreen from 'screens/story/StoryPhotosScreen';
 import StoryIndividualPhotoScreen from 'screens/story/StoryIndividualPhotoScreen';
 import LoadingSplash from './LoadingSplash';
-import { setUser, setUserToken } from '../stores';
-import { sendRequest } from 'utils/index';
+import { setUserToken } from '../stores';
+import useAsyncEffect from 'utils/hooks/useAsyncEffect';
 
 const Stack = createNativeStackNavigator();
-
-async function evictExpiredMessages() {
-  const currentTime = new Date().getTime();
-  const timeLimit = 60 * 60 * 1000; // 1 hours in milliseconds
-  // const timeLimit = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-
-  try {
-    const allKeys = await AsyncStorage.getAllKeys();
-    const messagesKeys = allKeys.filter((key) => key.includes('messages'));
-
-    for (const key of messagesKeys) {
-      // await AsyncStorage.removeItem(key);
-
-      // const [_, _2, timestamp] = key.split('_');
-      // const age = currentTime - parseInt(timestamp, 10);
-      // if (age > timeLimit) {
-      //   await AsyncStorage.removeItem(key);
-      // }
-    }
-  } catch (error) {
-    console.error('Error evicting expired messages:', error);
-  }
-}
 
 export default function Navigator() {
   const [loading, setLoading] = useState(true);
@@ -60,34 +35,15 @@ export default function Navigator() {
     NiveauGroteskLight: require('../assets/fonts/NiveauGroteskLight.ttf'),
   });
 
-  useEffect(() => {
-    const asyncFn = async () => {
-      const storeUserToken = await SecureStore.getItemAsync('userToken');
+  useAsyncEffect(async () => {
+    const storeUserToken = await SecureStore.getItemAsync('userToken');
 
-      // await SecureStore.deleteItemAsync('userToken');
-      if (storeUserToken) {
-        dispatch(setUserToken(storeUserToken))
-        const [result] = await sendRequest('/users', {
-          headers: {
-            'Authorization': `Bearer ${storeUserToken}`,
-          },
-        })
-        
-        if (result.user) {
-          dispatch(setUser(result.user));
-        }
-      }
-
-      setLoading(false);
+    // await SecureStore.deleteItemAsync('userToken');
+    if (storeUserToken) {
+      dispatch(setUserToken(storeUserToken))
     }
-    asyncFn();
-  }, []);
 
-  useEffect(() => {
-    const asyncFn = async () => {
-      await evictExpiredMessages();
-    };
-    asyncFn();
+    setLoading(false);
   }, []);
 
   if (!fontsLoaded || loading) {

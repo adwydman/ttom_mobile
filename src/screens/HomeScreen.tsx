@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Platform, View, Image, FlatList, Pressable } from 'react-native';
+import { View, Image, FlatList } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useDispatch, useSelector } from 'react-redux';
-import { FontAwesome } from '@expo/vector-icons';
+import { focusManager } from '@tanstack/react-query'
+
 import { IScreenProps } from '../shared/apitypes';
-import { sendRequest, noAvailableStoriesMessage, sortStoriesByAccess } from 'utils/index';
-import { style } from './HomeScreen.style';
+import { noAvailableStoriesMessage, sortStoriesByAccess } from 'utils/index';
 import Text from '../components/Text';
 import { H1 } from 'components/Headers';
 import Container from 'components/Container';
@@ -13,6 +13,8 @@ import OwnedStory from 'components/OwnedStory';
 import LibraryStory from 'components/LibraryStory';
 import LibraryStorySkeleton from 'components/skeletons/LibraryStorySkeleton';
 import { setUser, setCurrentStory, setCurrentScreenName } from 'stores/index';
+import useAsyncEffect from 'utils/hooks/useAsyncEffect';
+import useRequest from 'utils/hooks/useRequest';
 
 const extras = [
   {
@@ -32,28 +34,16 @@ const extras = [
   }
 ]
 
-export function HomeHeader({navigation}) {
-  const viewStyle = {
-    ...style.homeHeader
-  } as any;
-
-  if (Platform.OS === 'ios') {
-    viewStyle.marginTop = 40;
-  } else if (Platform.OS === 'android') {
-    viewStyle.marginTop = 8;
-    viewStyle.marginBottom = 8;
-  }
-
-  return (
-    <View style={viewStyle} testID="home-header">
-      <Pressable style={{ width: 40 }} onPress={() => { navigation.openDrawer() }}>
-        <FontAwesome style={{ fontSize: 24 }} name={'user'} />
-      </Pressable>
-      {/* todo: comment this out for now */}
-      {/* <FontAwesome style={{ fontSize: 24 }} name={'search'} /> */}
-    </View>
-  );
-}
+const fetchedFields = [
+  '_id',
+  'name',
+  'author',
+  'picture',
+  'duration',
+  'categories',
+  'description',
+  'mainCharacter',
+]
 
 export default function HomeScreen({ navigation }: IScreenProps) {
   const [purchasedStories, setPurchasedStories] = useState([]);
@@ -65,16 +55,30 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   })
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.storeSlice.user);
-  const userToken = useSelector((state: any) => state.storeSlice.userToken);
   const currentStory = useSelector((state: any) => state.storeSlice.currentStory);
-
-  Notifications.addNotificationResponseReceivedListener(response => {
-    const { contactName } = response.notification.request.content.data
-
-    navigation.navigate('StoryConversation', {
-      screenTitle: contactName,
-    })
+  const { data: stories } = useRequest({
+    queryKey: ['stories'],
+    url: `/stories?fields=${fetchedFields.join(',')}`,
   });
+
+  useRequest({
+    queryKey: ['user'], 
+    url: '/users',
+    refetchOnScreenFocus: true,
+    onSuccess: (data: any) => {
+      dispatch(setUser(data.user));
+    }
+  });
+
+  useEffect(() => {
+    Notifications.addNotificationResponseReceivedListener(response => {
+      const { contactName } = response.notification.request.content.data
+  
+      navigation.navigate('StoryConversation', {
+        screenTitle: contactName,
+      })
+    });
+  }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -83,55 +87,29 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         dispatch(setCurrentStory({}));
       }
 
-      // fetch user to see if there are any changes to stories
-      const [userResult] = await sendRequest('/users', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${userToken}`,
-        },
-      })
-
-      dispatch(setUser(userResult.user));
+      focusManager.setFocused(true);
     });
 
     return unsubscribe;
   }, [navigation, currentStory]);
 
-  useEffect(() => {
-    const asyncFn = async () => {
-      setIsFetchingStories(true);
+  useAsyncEffect(async () => {
+    if (!user.token || !stories) {
+      return; 
+    }
+    setIsFetchingStories(true);
 
-      const fetchedFields = [
-        '_id',
-        'name',
-        'author',
-        'picture',
-        'duration',
-        'categories',
-        'description',
-        'mainCharacter',
-      ]
-    
-      const [stories] = await sendRequest(`/stories?fields=${fetchedFields.join(',')}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${userToken}`,
-        },
-      })
+    // newly bought stories should be displayed first
+    const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
+    const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
 
-      const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
-      const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
-  
-      const sortedPurchasedStories = await sortStoriesByAccess(user._id, userPurchasedStories);
+    const sortedPurchasedStories = await sortStoriesByAccess(user._id, userPurchasedStories);
 
-      setDisplayableStories(filteredStories);
-      setPurchasedStories(sortedPurchasedStories);
+    setDisplayableStories(filteredStories);
+    setPurchasedStories(sortedPurchasedStories);
 
-      setIsFetchingStories(false);
-    };
-
-    asyncFn();
-  }, [user])
+    setIsFetchingStories(false);
+  }, [user, stories])
 
   return (
     <View>

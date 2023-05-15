@@ -7,6 +7,8 @@ import StoryFrame from './StoryFrame';
 import { IScreenProps } from 'shared/apitypes';
 import Text from 'components/Text'
 import { BubbleTail } from 'components/svgs';
+import Button from 'components/Button';
+import Container from 'components/Container';
 import { colors } from '../../colors';
 import { style } from './StoryConversationScreen.style';
 import { setRawMessages, setCurrentScreenName } from '../../stores';
@@ -153,6 +155,22 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     const conversationLength = conversation.length;
     let nextConversationItem = conversation[startingIndex + 1];
     let lastType: string|null = null;
+
+    if (startingIndex !== 0) {
+      parsedMessages.push(
+        <Container key={'loadMorePrevious'} style={{ marginTop: 20, marginBottom: 20 }}>
+          <Button onPress={() => {
+            console.log('button?')
+            if (startingIndex < 20) {
+              setStartingIndex(0);
+            } else {
+              setStartingIndex(startingIndex - 20);
+            }
+            setOldStartingIndex(startingIndex)
+          }}>Load more messages</Button>
+        </Container>
+      )
+    }
   
     for (let i = startingIndex; i < conversationLength; i++) {
       const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
@@ -265,35 +283,13 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     }
 
     return parsedMessages;
-  }, [conversation, seenMessages, startingIndex])
-
-  const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}: any) => {
-    const paddingToBottom = 20;
-    return layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom;
-  };
-
-  const isCloseToTop = ({contentOffset}: any) => {
-    const paddingToTop = 20;
-    return contentOffset.y <= paddingToTop;
-
-  };
+  }, [conversation, startingIndex])
 
   return (
     <StoryFrame navigation={navigation} onBothPress={optimisticallyUpdateMessages} route={route}>
       <IOScrollView
         ref={scrollViewRef}
         onLayout={scrollOnLoad}
-        onScrollEndDrag={({nativeEvent}) => {
-          if (isCloseToBottom(nativeEvent)) {
-            console.log('bottom?')
-          }
-          if (isCloseToTop(nativeEvent)) {
-            console.log('top?');
-            setStartingIndex(startingIndex - 20);
-            setOldStartingIndex(startingIndex)
-          }
-        }}
       >
         { parsedMessages }
       </IOScrollView>
