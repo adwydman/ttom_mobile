@@ -28,7 +28,8 @@ export default function Navigator() {
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
 
   const [fontsLoaded] = useFonts({
-    LibreCaslonTextBold: require('../assets/fonts/LibreCaslonText-Bold.ttf'),
+    BelyDisplay: require('../assets/fonts/BelyDisplay.otf'),
+    // LibreCaslonTextBold: require('../assets/fonts/LibreCaslonText-Bold.ttf'),
     Niveau_smallCaps: require('../assets/fonts/Niveau_smallCaps.ttf'),
     NiveauGroteskMedium: require('../assets/fonts/NiveauGroteskMedium.ttf'),
     NiveauGroteskRegular: require('../assets/fonts/NiveauGroteskRegular.ttf'),

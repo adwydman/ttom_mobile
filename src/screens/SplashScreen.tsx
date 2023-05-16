@@ -21,7 +21,7 @@ export default function SplashScreen({ navigation, route }: IScreenProps) {
       <SplashWave2 style={{ position: 'absolute', top: '15%'}}/>
       <View style={{ display: 'flex', alignItems: 'center' }}>
         <TtomLogo />
-        <Text style={{ color: colors.blue, fontSize: 96, fontFamily: 'LibreCaslonTextBold'}}>ttom</Text>
+        <Text style={{ color: colors.blue, fontSize: 96, fontFamily: 'BelyDisplay'}}>ttom</Text>
         <Text style={{ color: colors.blue, fontSize: 24 }}>a chat fiction app for grown-ups</Text>
       </View>
       <Container>
