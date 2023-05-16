@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFonts } from 'expo-font';
 import { useSelector, useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
@@ -29,7 +29,6 @@ export default function Navigator() {
 
   const [fontsLoaded] = useFonts({
     BelyDisplay: require('../assets/fonts/BelyDisplay.otf'),
-    // LibreCaslonTextBold: require('../assets/fonts/LibreCaslonText-Bold.ttf'),
     Niveau_smallCaps: require('../assets/fonts/Niveau_smallCaps.ttf'),
     NiveauGroteskMedium: require('../assets/fonts/NiveauGroteskMedium.ttf'),
     NiveauGroteskRegular: require('../assets/fonts/NiveauGroteskRegular.ttf'),
