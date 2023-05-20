@@ -67,6 +67,8 @@ export default function StoryTextMessagesScreen({ navigation, route }: IScreenPr
     <StoryFrame navigation={navigation} route={route}>
       {
         Object.keys(textMessages).map((contactName) => {
+
+          //todo: order by the most recent message
           const conversation = textMessages[contactName];
 
           const { message } = conversation[conversation.length - 1];

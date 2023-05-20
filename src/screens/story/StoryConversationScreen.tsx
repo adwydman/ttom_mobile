@@ -157,6 +157,8 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     let lastType: string|null = null;
 
     if (startingIndex !== 0) {
+
+      //todo: make a link
       parsedMessages.push(
         <Container key={'loadMorePrevious'} style={{ marginTop: 20, marginBottom: 20 }}>
           <Button onPress={() => {
