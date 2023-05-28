@@ -1,6 +1,7 @@
 import { View, Pressable, Image } from 'react-native';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { cloneDeep } from 'lodash';
 import { IOScrollView, InView } from 'react-native-intersection-observer'
 import { HeaderBackButton } from '@react-navigation/elements'
 import StoryFrame from './StoryFrame';
@@ -87,33 +88,33 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const conversation = textMessages[screenTitle];
 
   const optimisticallyUpdateMessages = useCallback(async () => {
-    // const newRawMessages = rawMessages.map((message) => {
-    //   let parsedMessage = message;
-    //   if (seenMessages.has(message._id)) {
-    //     parsedMessage = cloneDeep(message);
-    //     parsedMessage.seenByUser = true;
-    //   }
+    const newRawMessages = rawMessages.map((message) => {
+      let parsedMessage = message;
+      if (seenMessages.has(message._id)) {
+        parsedMessage = cloneDeep(message);
+        parsedMessage.seenByUser = true;
+      }
 
-    //   return parsedMessage;
-    // })
+      return parsedMessage;
+    })
 
-    // dispatch(setRawMessages(newRawMessages));
+    dispatch(setRawMessages(newRawMessages));
 
-    // sendRequest('/userStoryTextMessages', {
-    //   method: 'PUT',
-    //   body: JSON.stringify({
-    //     storyId: currentStory._id,
-    //     conversationIds: Array.from(seenMessages),
-    //     seenByUser: true,
-    //   }),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${userToken}`,
-    //   },
-    // })
-    // .catch(() => {
-    //   dispatch(setRawMessages(rawMessages));
-    // })
+    sendRequest('/userStoryTextMessages', {
+      method: 'PUT',
+      body: JSON.stringify({
+        storyId: currentStory._id,
+        conversationIds: Array.from(seenMessages),
+        seenByUser: true,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`,
+      },
+    })
+    .catch(() => {
+      dispatch(setRawMessages(rawMessages));
+    })
   }, [dispatch, rawMessages, seenMessages, userToken, currentStory]);
 
   useEffect(() => {
