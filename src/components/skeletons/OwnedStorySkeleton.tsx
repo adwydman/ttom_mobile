@@ -5,7 +5,7 @@ import Container from 'components/Container';
 import StoryCard from 'components/StoryCard';
 import { colors } from '../../colors';
 
-const SMALL_LOADER_HEIGHT = 32;
+const SMALL_LOADER_HEIGHT = 24;
 
 const styles = StyleSheet.create({
   smallSkeletonWrapper: {
@@ -13,6 +13,16 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     backgroundColor: colors.darkerSky,
+  },
+  storyCard: {
+    marginRight: 12,
+    marginLeft: 12
+  },
+  firstStoryCard: {
+    marginLeft: 0
+  },
+  lastStoryCard: {
+    marginRight: 0
   }
 })
 
@@ -27,22 +37,31 @@ const CustomGradient = (props) => {
 
 interface IProps {
   count?: number;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
-export default function LibraryStorySkeleton(props) {
-  const { count = 1 } = props;
+export default function LibraryStorySkeleton(props: IProps) {
+  const { count = 1, isFirst, isLast } = props;
 
   const windowWidth = Dimensions.get('window').width;
+  const panelWidth = windowWidth / 2.5;
+
+  const firstStoryCard = isFirst ? styles.firstStoryCard : {};
+  const lastStoryCard = isLast ? styles.lastStoryCard : {};
 
   return (
     <>
       {
         [...Array(count)].map((_, i) => {
           return (
-            <StoryCard key={`skeleton_card_${i}`}>
+            <StoryCard
+              key={`owned_story_skeleton_${i}`}
+              style={{ ...styles.storyCard, ...firstStoryCard, ...lastStoryCard, width: panelWidth }}
+            >
               <Skeleton
                 animation="wave"
-                height={windowWidth}
+                height={panelWidth}
                 style={styles.skeleton}
                 LinearGradientComponent={CustomGradient}
               />
@@ -54,17 +73,6 @@ export default function LibraryStorySkeleton(props) {
                   LinearGradientComponent={CustomGradient}
                   height={SMALL_LOADER_HEIGHT}
                   style={styles.skeleton}
-                  width={windowWidth / 2}
-                />
-              </Container>
-              <Container
-                style={styles.smallSkeletonWrapper}
-              >
-                <Skeleton
-                  animation="wave"
-                  LinearGradientComponent={CustomGradient}
-                  style={styles.skeleton}
-                  height={SMALL_LOADER_HEIGHT}
                 />
               </Container>
             </StoryCard>

@@ -11,6 +11,7 @@ import { H1 } from 'components/Headers';
 import Container from 'components/Container';
 import OwnedStory from 'components/OwnedStory';
 import LibraryStory from 'components/LibraryStory';
+import OwnedStorySkeleton from 'components/skeletons/OwnedStorySkeleton';
 import LibraryStorySkeleton from 'components/skeletons/LibraryStorySkeleton';
 import { setUser, setCurrentStory, setCurrentScreenName } from 'stores/index';
 import useAsyncEffect from 'utils/hooks/useAsyncEffect';
@@ -123,21 +124,26 @@ export default function HomeScreen({ navigation }: IScreenProps) {
                     My Stories 
                     <Text style={{fontSize: 20}}> ({purchasedStories.length})</Text>
                   </H1>
+                  <FlatList
+                    data={purchasedStories}
+                    horizontal={true}
+                    renderItem={({ item, index }) => {
+                      const isFirst = index === 0;
+                      const isLast = index === purchasedStories.length - 1;
+                      return <OwnedStorySkeleton count={1} isFirst={isFirst} isLast={isLast} />
+                      // return <OwnedStory key={item.name} story={item} navigation={navigation} isFirst={isFirst} isLast={isLast} />
+                    }}
+                  />
                 </Container>
-                <FlatList
-                  data={purchasedStories}
-                  horizontal={true}
-                  renderItem={({ item }) => <OwnedStory story={item} navigation={navigation} />}
-                />
               </>
             }
             <Container>
               <H1>Browse Stories</H1>
             </Container>
             {
-              // !isFetchingStories && <LibraryStorySkeleton />
+              <LibraryStorySkeleton count={2}/>
             }
-            {
+            {/* {
               displayableStories.length ? 
                 displayableStories.map((story: any) => <LibraryStory
                     key={story.name}
@@ -149,7 +155,7 @@ export default function HomeScreen({ navigation }: IScreenProps) {
                     <Text>{noStoriesAvailableMessage}</Text>
                   </Container>
                 })()
-            }
+            } */}
             <Container>
               <H1>Extras</H1>
             </Container>

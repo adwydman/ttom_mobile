@@ -63,7 +63,6 @@ export const styles = StyleSheet.create({
   }
 });
 
-
 interface IMessageProps {
   type: 'left' | 'right';
   children: string;
@@ -284,8 +283,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           </View>
         )
       }
-
-      console.log('shouldShowTail', shouldShowTail)
   
       parsedMessages.push(
         <InView
@@ -295,7 +292,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           onLayout={(event) => {
             if (message === firstUnreadMessage2) {
               if (scrollViewRef.current && scrolledOnLoad.current === false) {
-                console.log('scroll to unread')
                 firstUnreadMessage.current = true;
   
                 let offset = 40;
@@ -307,7 +303,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
               }
             } else if (message === scrollToMessageWhenLazyLoading) {
               if (scrollViewRef.current) {
-                console.log('scroll to message when lazy loading')
                 firstUnreadMessage.current = true;
   
                 let offset = 40;
@@ -331,12 +326,6 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           </Message>
         </InView>
       );
-
-      // if (i + 1 < conversationLength) {
-      //   nextConversationItem = conversation[i + 1];
-      // } else {
-      //   nextConversationItem = null;
-      // }
     }
 
     return parsedMessages;

@@ -95,7 +95,7 @@ export default function Button(props: IProps) {
   let loadingIndicatorStyle = {};
 
   if (loading && Platform.OS === 'ios') {
-    loadingIndicatorStyles.paddingTop = 6;
+    loadingIndicatorStyle.paddingTop = 6;
   }
 
   const buttonContent = loading ? <ActivityIndicator style={loadingIndicatorStyle} /> : children;

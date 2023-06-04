@@ -7,7 +7,9 @@ export const style = {
     shadowOffset: {width: -2, height: 4},  
     shadowColor: colors.black,  
     shadowOpacity: 0.2,  
-    shadowRadius: 3,  
+    shadowRadius: 3,
+    marginLeft: 12,
+    marginRight: 12
   },
   imageCover: {
     flex: 1,

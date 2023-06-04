@@ -11,5 +11,7 @@ export const colors = {
   pinkyOrange: '#FE4A49',
   offWhite1: '#EEEEEE',
   disabledBlue: '#c3d9fc',
-  errorRed: '#ff0033'
+  errorRed: '#ff0033',
+  darkerSky: '#E6E9EF',
+  gradientWhite: '#fcfcfd'
 }
