@@ -1,8 +1,9 @@
 import { Dimensions, StyleSheet } from 'react-native';
 import { Skeleton } from '@rneui/themed';
-import { LinearGradient } from 'expo-linear-gradient';
 import Container from 'components/Container';
 import StoryCard from 'components/StoryCard';
+import SkeletonGradient from './SkeletonGradient';
+import BaseSkeleton from './BaseSkeleton';
 import { colors } from '../../colors';
 
 const SMALL_LOADER_HEIGHT = 24;
@@ -25,15 +26,6 @@ const styles = StyleSheet.create({
     marginRight: 0
   }
 })
-
-const CustomGradient = (props) => {
-  return (
-    <LinearGradient 
-      {...props} 
-      colors={[colors.darkerSky, colors.gradientWhite, colors.darkerSky]}
-    />
-  );
-}
 
 interface IProps {
   count?: number;
@@ -59,20 +51,12 @@ export default function LibraryStorySkeleton(props: IProps) {
               key={`owned_story_skeleton_${i}`}
               style={{ ...styles.storyCard, ...firstStoryCard, ...lastStoryCard, width: panelWidth }}
             >
-              <Skeleton
-                animation="wave"
+              <BaseSkeleton
                 height={panelWidth}
-                style={styles.skeleton}
-                LinearGradientComponent={CustomGradient}
               />
-              <Container
-                style={styles.smallSkeletonWrapper}
-              >
-                <Skeleton
-                  animation="wave"
-                  LinearGradientComponent={CustomGradient}
+              <Container style={styles.smallSkeletonWrapper}>
+                <BaseSkeleton
                   height={SMALL_LOADER_HEIGHT}
-                  style={styles.skeleton}
                 />
               </Container>
             </StoryCard>
