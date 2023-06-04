@@ -1,4 +1,4 @@
-import { View, Pressable, Image } from 'react-native';
+import { StyleSheet, View, Pressable, Image } from 'react-native';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { cloneDeep } from 'lodash';
@@ -11,7 +11,6 @@ import { BubbleTail } from 'components/svgs';
 import Button from 'components/Button';
 import Container from 'components/Container';
 import { colors } from '../../colors';
-import { style } from './StoryConversationScreen.style';
 import { setRawMessages, setCurrentScreenName } from '../../stores';
 import {
   isImage,
@@ -21,6 +20,49 @@ import {
   getConversationStartingIndex,
   getShouldDisplayCenteredTimestamp,
 } from 'utils/index';
+
+export const styles = StyleSheet.create({
+  bubble: {
+    borderRadius: 6,
+    padding: 8,
+    maxWidth: '70%',
+    marginBottom: 2
+  },
+  left: {
+    alignSelf: 'flex-start',
+    backgroundColor: colors.white,
+    marginLeft: 16
+  },
+  right: {
+    alignSelf: 'flex-end',
+    backgroundColor: colors.blue,
+    marginRight: 16
+  },
+  timestamp: {
+    color: '#bcc1c6',
+    fontSize: 10,
+  },
+  message: {
+    fontSize: 16,
+    lineHeight: 24
+  },
+  leftFont: {},
+  rightFont: {
+    color: colors.white
+  },
+  tail: {
+    position: 'absolute',
+    bottom: 4,
+  },
+  leftTail: {
+    left: 8,
+  },
+  rightTail: {
+    right: 8,
+    transform: [ { scaleX: -1 } ]
+  }
+});
+
 
 interface IMessageProps {
   type: 'left' | 'right';
@@ -55,18 +97,18 @@ function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail, 
         ) 
       }
       <View>
-        <View style={{...style.bubble, ...style[type], ...extraStyles}}>
+        <View style={{...styles.bubble, ...styles[type], ...extraStyles}}>
           {
             isImage(children) ?
               <Image source={{ uri: children }} style={{ width: 200, height: 200, resizeMode: 'cover',}} /> :
-              <Text style={{...style.message, ...style[`${type}Font`]}}>{children}</Text>
+              <Text style={{...styles.message, ...styles[`${type}Font`]}}>{children}</Text>
           }
         </View>
-        { shouldShowTail && <BubbleTail style={{...style.tail, ...style[`${type}Tail`]}} fill={tailFill} /> }
+        { shouldShowTail && <BubbleTail style={{...styles.tail, ...styles[`${type}Tail`]}} fill={tailFill} /> }
       </View>
       {
         showTimestamp &&
-        <Text style={{ ...style[type], backgroundColor: 'transparent', fontSize: 12, marginBottom: 8 }}>{timestamp}</Text>
+        <Text style={{ ...styles[type], backgroundColor: 'transparent', fontSize: 12, marginBottom: 8 }}>{timestamp}</Text>
       }
     </Pressable>
   )
@@ -88,33 +130,33 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
   const conversation = textMessages[screenTitle];
 
   const optimisticallyUpdateMessages = useCallback(async () => {
-    const newRawMessages = rawMessages.map((message) => {
-      let parsedMessage = message;
-      if (seenMessages.has(message._id)) {
-        parsedMessage = cloneDeep(message);
-        parsedMessage.seenByUser = true;
-      }
+    // const newRawMessages = rawMessages.map((message) => {
+    //   let parsedMessage = message;
+    //   if (seenMessages.has(message._id)) {
+    //     parsedMessage = cloneDeep(message);
+    //     parsedMessage.seenByUser = true;
+    //   }
 
-      return parsedMessage;
-    })
+    //   return parsedMessage;
+    // })
 
-    dispatch(setRawMessages(newRawMessages));
+    // dispatch(setRawMessages(newRawMessages));
 
-    sendRequest('/userStoryTextMessages', {
-      method: 'PUT',
-      body: JSON.stringify({
-        storyId: currentStory._id,
-        conversationIds: Array.from(seenMessages),
-        seenByUser: true,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userToken}`,
-      },
-    })
-    .catch(() => {
-      dispatch(setRawMessages(rawMessages));
-    })
+    // sendRequest('/userStoryTextMessages', {
+    //   method: 'PUT',
+    //   body: JSON.stringify({
+    //     storyId: currentStory._id,
+    //     conversationIds: Array.from(seenMessages),
+    //     seenByUser: true,
+    //   }),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${userToken}`,
+    //   },
+    // })
+    // .catch(() => {
+    //   dispatch(setRawMessages(rawMessages));
+    // })
   }, [dispatch, rawMessages, seenMessages, userToken, currentStory]);
 
   useEffect(() => {
@@ -154,7 +196,7 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
     let firstUnreadMessage2 = null;
     let scrollToMessageWhenLazyLoading = null;
     const conversationLength = conversation.length;
-    let nextConversationItem = conversation[startingIndex + 1];
+    let nextConversationItem = null;
     let lastType: string|null = null;
 
     if (startingIndex !== 0) {
@@ -162,20 +204,30 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
       //todo: make a link
       parsedMessages.push(
         <Container key={'loadMorePrevious'} style={{ marginTop: 20, marginBottom: 20 }}>
-          <Button onPress={() => {
-            console.log('button?')
-            if (startingIndex < 20) {
-              setStartingIndex(0);
-            } else {
-              setStartingIndex(startingIndex - 20);
-            }
-            setOldStartingIndex(startingIndex)
-          }}>Load more messages</Button>
+          <Button
+            type={'link'}
+            onPress={() => {
+              if (startingIndex < 20) {
+                setStartingIndex(0);
+              } else {
+                setStartingIndex(startingIndex - 20);
+              }
+              setOldStartingIndex(startingIndex)
+            }}
+          >
+            Load more messages
+          </Button>
         </Container>
       )
     }
   
     for (let i = startingIndex; i < conversationLength; i++) {
+      if (i + 1 < conversationLength) {
+        nextConversationItem = conversation[i + 1];
+      } else {
+        nextConversationItem = null;
+      }
+
       const { _id, message, whoFrom, enabledAt, seenByUser } = conversation[i];
       const type = isMainCharacter(whoFrom) ? 'right' : 'left';
       let shouldShowTail = true;
@@ -232,6 +284,8 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
           </View>
         )
       }
+
+      console.log('shouldShowTail', shouldShowTail)
   
       parsedMessages.push(
         <InView
@@ -278,11 +332,11 @@ export default function StoryConversationScreen({ navigation, route }: IScreenPr
         </InView>
       );
 
-      if (i + 1 < conversationLength) {
-        nextConversationItem = conversation[i + 1];
-      } else {
-        nextConversationItem = null;
-      }
+      // if (i + 1 < conversationLength) {
+      //   nextConversationItem = conversation[i + 1];
+      // } else {
+      //   nextConversationItem = null;
+      // }
     }
 
     return parsedMessages;

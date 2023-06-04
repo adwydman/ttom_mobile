@@ -1,6 +1,9 @@
-import { Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useMemo } from 'react';
+import { StyleSheet, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
 import Text from './Text';
-import { style } from './Button.style';
+import { colors } from '../colors';
+
+type ButtonType = 'filled' | 'empty' | 'link';
 
 interface IProps {
   image?: React.ReactNode;
@@ -8,9 +11,64 @@ interface IProps {
   children: any;
   textStyle?: any;
   buttonStyle?: any;
-  type?: 'filled' | 'empty';
+  type?: ButtonType;
   loading?: boolean;
   disabled?: boolean;
+}
+
+const styles = StyleSheet.create({
+  button: {
+    borderWidth: 2,
+    borderColor: colors.blue,
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonDisabled: {
+    borderColor: colors.disabledBlue,
+    backgroundColor: colors.disabledBlue
+  },
+  buttonFilled: {
+    backgroundColor: colors.blue,
+  },
+  buttonEmpty: {
+    backgroundColor: colors.white,
+  },
+  buttonLink: {
+    borderWidth: 0,
+    height: 24
+  },
+  text: {
+    fontSize: 18,
+    lineHeight: 24
+  },
+  textFilled: {
+    color: colors.white,
+  },
+  textEmpty: {
+    color: colors.blue,
+  },
+  textLink: {
+    color: colors.blue
+  }
+});
+
+const getButtonStyles = (type: ButtonType) => {
+  let buttonTypeStyle = {};
+  let textTypeStyle = {};
+  if (type === 'filled') {
+    buttonTypeStyle = styles.buttonFilled;
+    textTypeStyle = styles.textFilled;
+  } else if (type === 'empty') {
+    buttonTypeStyle = styles.buttonEmpty;
+    textTypeStyle = styles.textEmpty;
+  } else if (type === 'link') {
+    buttonTypeStyle = styles.buttonLink;
+    textTypeStyle = styles.textLink;
+  }
+
+  return { buttonTypeStyle, textTypeStyle };
 }
 
 
@@ -26,19 +84,18 @@ export default function Button(props: IProps) {
     disabled,
   } = props;
 
-  const buttonTypeStyle = type === 'filled' ? style.buttonFilled : style.buttonEmpty;
-  const textTypeStyle = type === 'filled' ? style.textFilled : style.textEmpty;
+  const { buttonTypeStyle, textTypeStyle } = useMemo(() => getButtonStyles(type), [type]);
 
   const touchableOpacityStyle = {
     ...buttonStyle,
-    ...style.button,
+    ...styles.button,
     ...buttonTypeStyle
   };
 
   let loadingIndicatorStyle = {};
 
   if (loading && Platform.OS === 'ios') {
-    loadingIndicatorStyle.paddingTop = 6;
+    loadingIndicatorStyles.paddingTop = 6;
   }
 
   const buttonContent = loading ? <ActivityIndicator style={loadingIndicatorStyle} /> : children;
@@ -46,7 +103,7 @@ export default function Button(props: IProps) {
   return (
     <TouchableOpacity style={touchableOpacityStyle} onPress={onPress} disabled={disabled || loading}>
       {image}
-      <Text style={{...textStyle, ...style.text, ...textTypeStyle}}>
+      <Text style={{...textStyle, ...styles.text, ...textTypeStyle}}>
         {buttonContent}
       </Text>
     </TouchableOpacity>
