@@ -1,19 +1,14 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import { Skeleton } from '@rneui/themed';
 import Container from 'components/Container';
 import StoryCard from 'components/StoryCard';
-import SkeletonGradient from './SkeletonGradient';
 import BaseSkeleton from './BaseSkeleton';
-import { colors } from '../../colors';
 
 const SMALL_LOADER_HEIGHT = 24;
 
 const styles = StyleSheet.create({
   smallSkeletonWrapper: {
-    marginTop: 16,
-  },
-  skeleton: {
-    backgroundColor: colors.darkerSky,
+    marginTop: 11,
+    marginBottom: -5
   },
   storyCard: {
     marginRight: 12,

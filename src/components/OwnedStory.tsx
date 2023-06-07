@@ -1,6 +1,6 @@
 import { View, Dimensions, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { Avatar, LinearProgress } from '@rneui/themed';
+import { Avatar } from '@rneui/themed';
 import Text from 'components/Text';
 import StoryImage from './StoryImage';
 import { setCurrentStory } from 'stores/index';
@@ -54,13 +54,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginRight: 4
   },
-  progressBarContainer: {
+  percentageBarContainer: {
     flex: 1,
-  },
-  progressBar: {
-    height: 8, 
+    position: 'relative',
+    width: '100%',
+    height: 8,
+    backgroundColor: colors.offWhite1,
     borderRadius: 100
-  }
+  },
+  percentageBar: {
+    position: 'absolute',
+    backgroundColor: colors.blue,
+    height: 8,
+    borderRadius: 100
+  },
 })
 
 
@@ -121,14 +128,8 @@ export default function OwnedStory({ story, navigation, isFirst, isLast }: IOwne
         </View>
         <View style={styles.percentageProgressContainer}>
           <Text style={styles.percentageFont}>{roundedCompleted}%</Text>
-          <View style={styles.progressBarContainer}>
-            <LinearProgress
-              animation={{ duration: 500 }}
-              value={roundedCompleted/100}
-              color={colors.blue}
-              trackColor={colors.offWhite1}
-              style={styles.progressBar}
-            />
+          <View style={styles.percentageBarContainer}>
+            <View style={{...styles.percentageBar, width: `${roundedCompleted}%`}}></View>
           </View>
         </View>
       </View>

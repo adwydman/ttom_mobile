@@ -49,7 +49,7 @@ const fetchedFields = [
 export default function HomeScreen({ navigation }: IScreenProps) {
   const [purchasedStories, setPurchasedStories] = useState([]);
   const [displayableStories, setDisplayableStories] = useState([]);
-  const [isFetchingStories, setIsFetchingStories] = useState(false);
+  const [isFetchingStories, setIsFetchingStories] = useState(true);
   const [noStoriesAvailableMessage] = useState(() => {
     const randomIndex = Math.floor(Math.random() * noAvailableStoriesMessage.length);
     return noAvailableStoriesMessage[randomIndex];
@@ -95,6 +95,7 @@ export default function HomeScreen({ navigation }: IScreenProps) {
   }, [navigation, currentStory]);
 
   useAsyncEffect(async () => {
+    // user should never be null, because it's fetched in Navigator
     if (!user.token || !stories) {
       return; 
     }
@@ -109,8 +110,10 @@ export default function HomeScreen({ navigation }: IScreenProps) {
     setDisplayableStories(filteredStories);
     setPurchasedStories(sortedPurchasedStories);
 
+    console.log('fetchin false')
     setIsFetchingStories(false);
-  }, [user, stories])
+
+  }, [JSON.stringify(user.stories), JSON.stringify(stories)])
 
   return (
     <View>
@@ -118,44 +121,53 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         ListHeaderComponent={
           <>
             {
-              purchasedStories.length > 0 && <>
-                <Container>
-                  <H1>
-                    My Stories 
-                    <Text style={{fontSize: 20}}> ({purchasedStories.length})</Text>
-                  </H1>
-                  <FlatList
+              user.stories.length > 0 && <Container>
+                <H1>
+                  My Stories 
+                  <Text style={{fontSize: 20}}> ({user.stories.length})</Text>
+                </H1>
+                {
+                  isFetchingStories && <FlatList
+                    data={[...Array(user.stories.length)]}
+                    horizontal={true}
+                    renderItem={({ item, index }) => {
+                      const isFirst = index === 0;
+                      const isLast = index === purchasedStories.length - 1;
+                      return <OwnedStorySkeleton key={`owned_story_skeleton_${index}`} isFirst={isFirst} isLast={isLast} />
+                    }}
+                  />
+                }
+                {
+                  !isFetchingStories && <FlatList
                     data={purchasedStories}
                     horizontal={true}
                     renderItem={({ item, index }) => {
                       const isFirst = index === 0;
                       const isLast = index === purchasedStories.length - 1;
-                      return <OwnedStorySkeleton count={1} isFirst={isFirst} isLast={isLast} />
-                      // return <OwnedStory key={item.name} story={item} navigation={navigation} isFirst={isFirst} isLast={isLast} />
+                      return <OwnedStory key={item.name} story={item} navigation={navigation} isFirst={isFirst} isLast={isLast} />
                     }}
                   />
+                }
                 </Container>
-              </>
             }
             <Container>
               <H1>Browse Stories</H1>
             </Container>
             {
-              <LibraryStorySkeleton count={2}/>
+              isFetchingStories ? 
+                <LibraryStorySkeleton count={2}/> :
+                  displayableStories.length ? 
+                    displayableStories.map((story: any) => <LibraryStory
+                        key={story.name}
+                        story={story}
+                        navigation={navigation}
+                      />
+                    ) : (() => {
+                      return <Container style={{ flexDirection: 'row', justifyContent: 'center' }}>
+                        <Text>{noStoriesAvailableMessage}</Text>
+                      </Container>
+                    })()
             }
-            {/* {
-              displayableStories.length ? 
-                displayableStories.map((story: any) => <LibraryStory
-                    key={story.name}
-                    story={story}
-                    navigation={navigation}
-                  />
-                ) : (() => {
-                  return <Container style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                    <Text>{noStoriesAvailableMessage}</Text>
-                  </Container>
-                })()
-            } */}
             <Container>
               <H1>Extras</H1>
             </Container>

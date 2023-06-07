@@ -16,8 +16,9 @@ import StoryConversationScreen from 'screens/story/StoryConversationScreen';
 import StoryPhotosScreen from 'screens/story/StoryPhotosScreen';
 import StoryIndividualPhotoScreen from 'screens/story/StoryIndividualPhotoScreen';
 import LoadingSplash from './LoadingSplash';
-import { setUserToken } from '../stores';
+import { setUser, setUserToken } from '../stores';
 import useAsyncEffect from 'utils/hooks/useAsyncEffect';
+import useRequest from 'utils/hooks/useRequest';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,8 +44,17 @@ export default function Navigator() {
       dispatch(setUserToken(storeUserToken))
     }
 
-    setLoading(false);
   }, []);
+
+  useRequest({
+    queryKey: ['user'], 
+    url: '/users',
+    refetchOnScreenFocus: true,
+    onSuccess: (data: any) => {
+      dispatch(setUser(data.user));
+      setLoading(false);
+    }
+  });
 
   if (!fontsLoaded || loading) {
     return <LoadingSplash />;
