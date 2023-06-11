@@ -1,4 +1,4 @@
-import { View, Dimensions } from 'react-native';
+import { View, Dimensions, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 import StoryImage from './StoryImage';
 import { style } from './LibraryStory.style';
@@ -13,6 +13,17 @@ interface IProps {
   navigation: any;
 }
 
+const styles = StyleSheet.create({
+  notApproved: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    zIndex: 1,
+    color: 'red',
+    fontSize: 28,
+  }
+})
+
 export default function LibraryStory({ story, navigation }: IProps) {
   const dispatch = useDispatch();
   const windowWidth = Dimensions.get('window').width;
@@ -24,7 +35,8 @@ export default function LibraryStory({ story, navigation }: IProps) {
         navigation.navigate('StoryInfo');
       }}
     >
-      <View style={{ width: '100%', height: windowWidth }}>
+      <View style={{ position: 'relative', width: '100%', height: windowWidth }}>
+        { !story.isApproved && <Text style={styles.notApproved}>Not Approved</Text> }
         <StoryImage
           story={story}
           panelWidth={windowWidth}

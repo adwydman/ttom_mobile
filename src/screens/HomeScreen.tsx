@@ -42,6 +42,7 @@ const fetchedFields = [
   'picture',
   'duration',
   'categories',
+  'isApproved',
   'description',
   'mainCharacter',
 ]
@@ -101,8 +102,11 @@ export default function HomeScreen({ navigation }: IScreenProps) {
     }
     setIsFetchingStories(true);
 
+    console.log('user', user)
+
     // newly bought stories should be displayed first
-    const filteredStories = stories.filter((story) => !user.stories.includes(story._id));
+    const filteredStories = stories.filter((story) => !user.stories.includes(story._id))
+
     const userPurchasedStories = stories.filter((story) => user.stories.includes(story._id));
 
     const sortedPurchasedStories = await sortStoriesByAccess(user._id, userPurchasedStories);
@@ -110,7 +114,6 @@ export default function HomeScreen({ navigation }: IScreenProps) {
     setDisplayableStories(filteredStories);
     setPurchasedStories(sortedPurchasedStories);
 
-    console.log('fetchin false')
     setIsFetchingStories(false);
 
   }, [JSON.stringify(user.stories), JSON.stringify(stories)])
