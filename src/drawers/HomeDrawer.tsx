@@ -4,7 +4,8 @@ import {
   DrawerItemList,
   DrawerItem
 } from '@react-navigation/drawer';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import HomeScreen from 'screens/HomeScreen';
@@ -14,6 +15,12 @@ import Container from 'components/Container'
 import { setUser, setUserToken } from '../stores';
 
 const Drawer = createDrawerNavigator();
+
+const styles = StyleSheet.create({
+  icon: {
+    marginRight: -15
+  },
+});
 
 function CustomDrawerContent(props) {
   const dispatch = useDispatch();
@@ -43,7 +50,7 @@ function CustomDrawerContent(props) {
         <Text>{user.email}</Text>
       </Container>
       <DrawerItemList {...props} />
-      <DrawerItem label="Log out" onPress={onLogoutPress} />
+      <DrawerItem label="Log out" icon={() => <FontAwesome name={'sign-out'} style={styles.icon} />} onPress={onLogoutPress} />
     </DrawerContentScrollView>
   );
 }
@@ -56,7 +63,10 @@ export default function HomeDrawer() {
       <Drawer.Screen
         name="Home"
         component={HomeScreen}
-        options={{ header: (props) => <HomeHeader navigation={props.navigation} /> }}
+        options={{
+          header: (props) => <HomeHeader navigation={props.navigation} />,
+          drawerIcon: () => <FontAwesome name={'home'} style={styles.icon}/>
+        }}
       />
     </Drawer.Navigator>
   )
