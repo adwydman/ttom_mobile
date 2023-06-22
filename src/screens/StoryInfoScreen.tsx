@@ -84,13 +84,6 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
       <Container>
         {
           !storyAlreadyAdded && <>
-            <Button
-              type={'empty'}
-              image={<Play width={24} height={24} style={{marginRight: 8}}/>}
-              buttonStyle={{marginTop: 24}}
-            >
-              Sample the Story
-            </Button>
             {
               !showConfirmAddToLibrary &&
               <Button buttonStyle={{marginTop: 16, marginBottom: 24}} onPress={() => setShowConfirmAddToLibrary(true)}>
