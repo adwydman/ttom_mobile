@@ -171,22 +171,24 @@ export default function HomeScreen({ navigation }: IScreenProps) {
                       </Container>
                     })()
             }
-            <Container>
+            {/* <Container>
               <H1>Extras</H1>
-            </Container>
+            </Container> */}
           </>
         }
         data={extras}
         renderItem={({ item, index }) => {
-          const marginRight = index + 1 === extras.length ? 36 : 12;
+          // gettin rid of this for now, but keeping it for the future
 
-          return <Container style={{flex: .5, marginRight: marginRight, marginBottom: 40}}>
-            <Image
-              style={{ width: "100%", height: 180 }}
-              source={item.image}
-            />
-            <Text style={{ marginTop: 8 }}>{item.text}</Text>
-          </Container>
+          // const marginRight = index + 1 === extras.length ? 36 : 12;
+
+          // return <Container style={{flex: .5, marginRight: marginRight, marginBottom: 40}}>
+          //   <Image
+          //     style={{ width: "100%", height: 180 }}
+          //     source={item.image}
+          //   />
+          //   <Text style={{ marginTop: 8 }}>{item.text}</Text>
+          // </Container>
         }}
         keyExtractor={item => item.id}
         numColumns={2}
