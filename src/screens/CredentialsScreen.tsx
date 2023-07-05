@@ -1,16 +1,23 @@
-import { useState } from 'react';
-import { View, TextInput, Pressable, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, TextInput, Pressable, Alert, Image, Dimensions } from 'react-native';
 import { useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import Button from 'components/Button';
 import Text from 'components/Text';
 import Container from 'components/Container';
 import { sendRequest } from 'utils/index';
 import { setUser, setUserToken } from '../stores';
 import { colors } from '../colors'
+import { FacebookLogo } from 'components/svgs';
+
+WebBrowser.maybeCompleteAuthSession();
+
+type CredentialsMode = 'login' | 'register';
 
 interface IProps {
-  mode: 'login' | 'register';
+  mode: CredentialsMode,
   navigation: any;
 }
 
@@ -20,7 +27,20 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    // androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
+    iosClientId: '486721598631-ooordmrt1e2so7u8r3bq3a70usap2gra.apps.googleusercontent.com',
+  });
   const dispatch = useDispatch();
+  
+  const windowWidth = Dimensions.get('window').width;
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      sendRequst(mode, response.authentication.accessToken);
+    }
+  }, [response]);
 
   const credentialInputStyle = {
     fontSize: 16,
@@ -58,12 +78,14 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     }
   }
 
-  const sendRequst = async (requestType) => {
+  const sendRequst = async (requestType: CredentialsMode, thirdPartyToken = '') => {
+    // todo: ensure HTTPS
     const [result, fetchResult] = await sendRequest(`/${requestType}`, {
       method: 'POST',
       body: JSON.stringify({
         email,
         password,
+        thirdPartyToken
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +114,7 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     if (!email.length) {
       return 'Email required.'
     } 
-    // uncomment when testing is finished. OR set a feature flag?
+    // todo: uncomment when testing is finished. OR set a feature flag?
     // else if (mode === 'register' && !email.match(/^\S+@\S+\.\S+$/)) {
     //   return 'Enter a valid email address.'
     // }
@@ -100,11 +122,11 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     return '';
   }
 
-  const valdiatePassword = () => {
+  const validatePassword = () => {
     if (!password.length) {
       return 'Password cannot be empty.'
     } 
-    // uncomment when testing is finished. OR set a feature flag?
+    // todo: uncomment when testing is finished. OR set a feature flag?
     // else if (mode === 'register' && !password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)) {
     //   return 'This password is too short. Create a longer password with at least 8 letters and numbers.'
     // }
@@ -114,7 +136,7 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
 
   const onButtonPress = async () => {
     const emailError = validateEmail();
-    const passwordError = valdiatePassword();
+    const passwordError = validatePassword();
 
     setEmailError(emailError)
     setPasswordError(passwordError)
@@ -187,6 +209,44 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
         loading={loading}
       >
         {buttonText}
+      </Button>
+      <View style={{ marginTop: 20, marginBottom: 34, position: 'relative' }}>
+        <Text style={{ 
+          position: 'absolute', 
+          left: windowWidth/2 - 8 - 14, // 2*padding - fontSize
+        }}>Or</Text>
+      </View>
+      <Button
+        buttonStyle={{
+          backgroundColor: colors.googleBlue,
+          borderColor: colors.googleBlue,
+        }}
+        image={<Image style={{position: 'absolute', left: -2, height: 52}} source={require('../assets/images/google.png')} />}
+        disabled={!request}
+        onPress={() => {
+          promptAsync();
+        }}
+      >
+        <Text style={{ color: colors.white, fontFamily: 'RobotoMedium', fontSize: 18 }}>
+          Sign in with Google
+        </Text>
+      </Button>
+
+      <Button
+        buttonStyle={{
+          backgroundColor: colors.facebookBlue,
+          borderColor: colors.facebookBlue,
+          marginTop: 12
+        }}
+        image={<FacebookLogo style={{position: 'absolute', left: 6}}/>}
+        disabled={!request}
+        onPress={() => {
+          promptAsync();
+        }}
+      >
+        <Text style={{ color: colors.white, fontFamily: 'RobotoMedium', fontSize: 18 }}>
+          Continue with Facebook
+        </Text>
       </Button>
       <View style={{ position: 'absolute', bottom: 40, width: '100%' }}>
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>

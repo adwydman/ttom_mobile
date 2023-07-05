@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "ttom",
     "name": "ttom_mobile",
     "slug": "ttom",
     "version": "1.0.0",
@@ -43,6 +44,13 @@
           "icon": "./local/assets/notification-icon.png",
           "color": "#ffffff",
           "sounds": []
+        }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": [],
+          "enableGooglePay": false
         }
       ]
     ],

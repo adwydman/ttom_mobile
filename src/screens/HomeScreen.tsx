@@ -102,8 +102,6 @@ export default function HomeScreen({ navigation }: IScreenProps) {
     }
     setIsFetchingStories(true);
 
-    console.log('user', user)
-
     // newly bought stories should be displayed first
     const filteredStories = stories.filter((story) => !user.stories.includes(story._id))
 

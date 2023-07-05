@@ -1,5 +1,5 @@
 import { TouchableOpacity, View, Animated } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import Svg, { Path, Circle, Mask, G } from 'react-native-svg';
 
 interface IProps {
   width?: number;
@@ -313,6 +313,21 @@ export const SplashWave2 = ({style = {}}: IProps) => {
     <View style={style}>
       <Svg width="428" height="751" viewBox="0 0 428 751" fill="none">
         <Path d="M-27.4389 47.1547C200.954 -53.953 281.796 12.2082 488.753 202.35C495.702 412.13 485.013 726.72 483.14 751C243.953 483.011 156.118 678.195 -27.439 526.733L-27.4389 47.1547Z" fill="white"/>
+      </Svg>
+    </View>
+  )
+}
+
+export const FacebookLogo = ({style = {}}: IProps) => {
+  return (
+    <View style={style}>
+      <Svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <Mask id="mask0_1817_1183" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32">
+          <Path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H32V32H0V0Z" fill="white"/>
+        </Mask>
+        <G mask="url(#mask0_1817_1183)">
+        <Path fill-rule="evenodd" clip-rule="evenodd" d="M32 16.0978C32 7.20722 24.8366 0 16 0C7.16344 0 0 7.20722 0 16.0978C0 24.1327 5.85097 30.7924 13.5 32V20.751H9.4375V16.0978H13.5V12.5512C13.5 8.51673 15.8887 6.2882 19.5434 6.2882C21.294 6.2882 23.125 6.60261 23.125 6.60261V10.5642H21.1074C19.1198 10.5642 18.5 11.805 18.5 13.0781V16.0978H22.9375L22.2281 20.751H18.5V32C26.149 30.7924 32 24.1327 32 16.0978Z" fill="#FFFFFE"/>
+        </G>
       </Svg>
     </View>
   )

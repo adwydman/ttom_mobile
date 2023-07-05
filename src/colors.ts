@@ -13,5 +13,7 @@ export const colors = {
   disabledBlue: '#c3d9fc',
   errorRed: '#ff0033',
   darkerSky: '#E6E9EF',
-  gradientWhite: '#fcfcfd'
+  gradientWhite: '#fcfcfd',
+  googleBlue: '#4285F4',
+  facebookBlue: '#1877F2',
 }

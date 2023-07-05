@@ -87,9 +87,9 @@ export default function Button(props: IProps) {
   const { buttonTypeStyle, textTypeStyle } = useMemo(() => getButtonStyles(type), [type]);
 
   const touchableOpacityStyle = {
-    ...buttonStyle,
     ...styles.button,
-    ...buttonTypeStyle
+    ...buttonTypeStyle,
+    ...buttonStyle,
   };
 
   let loadingIndicatorStyle = {};
@@ -103,7 +103,7 @@ export default function Button(props: IProps) {
   return (
     <TouchableOpacity style={touchableOpacityStyle} onPress={onPress} disabled={disabled || loading}>
       {image}
-      <Text style={{...textStyle, ...styles.text, ...textTypeStyle}}>
+      <Text style={{...styles.text, ...textTypeStyle, ...textStyle}}>
         {buttonContent}
       </Text>
     </TouchableOpacity>

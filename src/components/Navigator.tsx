@@ -23,13 +23,14 @@ import useRequest from 'utils/hooks/useRequest';
 const Stack = createNativeStackNavigator();
 
 export default function Navigator() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const userToken = useSelector((state: any) => state.storeSlice.userToken);
 
   const [fontsLoaded] = useFonts({
     BelyDisplay: require('../assets/fonts/BelyDisplay.otf'),
+    RobotoMedium: require('../assets/fonts/Roboto-Medium.ttf'),
     Niveau_smallCaps: require('../assets/fonts/Niveau_smallCaps.ttf'),
     NiveauGroteskMedium: require('../assets/fonts/NiveauGroteskMedium.ttf'),
     NiveauGroteskRegular: require('../assets/fonts/NiveauGroteskRegular.ttf'),
@@ -39,7 +40,7 @@ export default function Navigator() {
   useAsyncEffect(async () => {
     const storeUserToken = await SecureStore.getItemAsync('userToken');
 
-    // await SecureStore.deleteItemAsync('userToken');
+    await SecureStore.deleteItemAsync('userToken');
     if (storeUserToken) {
       dispatch(setUserToken(storeUserToken))
     }
