@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
+import * as Facebook from 'expo-auth-session/providers/facebook';
 import Button from 'components/Button';
 import Text from 'components/Text';
 import Container from 'components/Container';
@@ -16,6 +17,8 @@ WebBrowser.maybeCompleteAuthSession();
 
 type CredentialsMode = 'login' | 'register';
 
+type ThirdPartyLogin = 'google' | 'facebook';
+
 interface IProps {
   mode: CredentialsMode,
   navigation: any;
@@ -27,20 +30,34 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  // const [thirdPartyLogin, setThirdPartyLogin] = useState<ThirdPartyLogin | null>(null);
+  const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
     // androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
-    expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
+    // expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
     iosClientId: '486721598631-ooordmrt1e2so7u8r3bq3a70usap2gra.apps.googleusercontent.com',
+  });
+
+  const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook.useAuthRequest({
+    // androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
+    // expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
+    clientId: '1407162533479919',
   });
   const dispatch = useDispatch();
   
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
-    if (response?.type === "success") {
-      sendRequst(mode, response.authentication.accessToken);
+    if (googleResponse?.type === "success") {
+      sendRequst(mode, googleResponse.authentication.accessToken, 'google');
     }
-  }, [response]);
+  }, [googleResponse]);
+
+  useEffect(() => {
+    if (facebookResponse?.type === "success") {
+      // console.log('facebookResponse.authentication.accessToken', facebookResponse.authentication.accessToken)
+      sendRequst(mode, facebookResponse.authentication.accessToken, 'facebook');
+    }
+  }, [facebookResponse]);
 
   const credentialInputStyle = {
     fontSize: 16,
@@ -78,13 +95,14 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     }
   }
 
-  const sendRequst = async (requestType: CredentialsMode, thirdPartyToken = '') => {
+  const sendRequst = async (requestType: CredentialsMode, thirdPartyToken = '', thirdParty = '') => {
     // todo: ensure HTTPS
     const [result, fetchResult] = await sendRequest(`/${requestType}`, {
       method: 'POST',
       body: JSON.stringify({
         email,
         password,
+        thirdParty,
         thirdPartyToken
       }),
       headers: {
@@ -222,9 +240,10 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
           borderColor: colors.googleBlue,
         }}
         image={<Image style={{position: 'absolute', left: -2, height: 52}} source={require('../assets/images/google.png')} />}
-        disabled={!request}
+        disabled={!googleRequest}
         onPress={() => {
-          promptAsync();
+          googlePromptAsync();
+          // setThirdPartyLogin('google');
         }}
       >
         <Text style={{ color: colors.white, fontFamily: 'RobotoMedium', fontSize: 18 }}>
@@ -239,9 +258,10 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
           marginTop: 12
         }}
         image={<FacebookLogo style={{position: 'absolute', left: 6}}/>}
-        disabled={!request}
+        disabled={!facebookRequest}
         onPress={() => {
-          promptAsync();
+          facebookPromptAsync();
+          // setThirdPartyLogin('facebook');
         }}
       >
         <Text style={{ color: colors.white, fontFamily: 'RobotoMedium', fontSize: 18 }}>
