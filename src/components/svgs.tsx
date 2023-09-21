@@ -1,5 +1,5 @@
 import { TouchableOpacity, View, Animated } from 'react-native';
-import Svg, { Path, Circle, Mask, G } from 'react-native-svg';
+import Svg, { Path, Circle, Mask, G, Rect } from 'react-native-svg';
 
 interface IProps {
   width?: number;
@@ -22,13 +22,24 @@ export const Logo = ({width, height, style = {}, onPress = () => {}}: IProps) =>
   )
 }
 
-export const Play = ({width, height, style = {}, onPress = () => {}}: IProps) => {
+export const Play = ({width, height, style = {}}: IProps) => {
   return (
-    <TouchableOpacity style={style} onPress={onPress}>
+    <View style={style}>
       <Svg height={height} width={width} viewBox="0 0 20 24">
         <Path fill-rule="evenodd" clip-rule="evenodd" d="M1.53952 23.0135C0.873933 23.44 0 22.962 0 22.1715L0 1.70497C0 0.941244 0.821514 0.459408 1.48809 0.832172L18.5436 10.37C19.2029 10.7387 19.231 11.6772 18.595 12.0848L1.53952 23.0135Z" fill="#0D47A1"/>
       </Svg>
-    </TouchableOpacity>
+    </View>
+  )
+}
+
+export const Pause = ({width, height, style = {}, onPress = () => {}}: IProps) => {
+  return (
+    <View style={style}>
+      <Svg width="17" height="20" viewBox="0 0 17 20">
+        <Rect x="0.833008" y="1.66602" width="5.83333" height="16.6667" rx="1" fill="#0D47A1"/>
+        <Rect x="10" y="1.66602" width="5.83333" height="16.6667" rx="1" fill="#0D47A1"/>
+      </Svg>
+    </View>
   )
 }
 
@@ -326,7 +337,7 @@ export const FacebookLogo = ({style = {}}: IProps) => {
           <Path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H32V32H0V0Z" fill="white"/>
         </Mask>
         <G mask="url(#mask0_1817_1183)">
-        <Path fill-rule="evenodd" clip-rule="evenodd" d="M32 16.0978C32 7.20722 24.8366 0 16 0C7.16344 0 0 7.20722 0 16.0978C0 24.1327 5.85097 30.7924 13.5 32V20.751H9.4375V16.0978H13.5V12.5512C13.5 8.51673 15.8887 6.2882 19.5434 6.2882C21.294 6.2882 23.125 6.60261 23.125 6.60261V10.5642H21.1074C19.1198 10.5642 18.5 11.805 18.5 13.0781V16.0978H22.9375L22.2281 20.751H18.5V32C26.149 30.7924 32 24.1327 32 16.0978Z" fill="#FFFFFE"/>
+          <Path fill-rule="evenodd" clip-rule="evenodd" d="M32 16.0978C32 7.20722 24.8366 0 16 0C7.16344 0 0 7.20722 0 16.0978C0 24.1327 5.85097 30.7924 13.5 32V20.751H9.4375V16.0978H13.5V12.5512C13.5 8.51673 15.8887 6.2882 19.5434 6.2882C21.294 6.2882 23.125 6.60261 23.125 6.60261V10.5642H21.1074C19.1198 10.5642 18.5 11.805 18.5 13.0781V16.0978H22.9375L22.2281 20.751H18.5V32C26.149 30.7924 32 24.1327 32 16.0978Z" fill="#FFFFFE"/>
         </G>
       </Svg>
     </View>

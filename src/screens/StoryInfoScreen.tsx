@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Dimensions, ScrollView } from 'react-native';
+import { View, Dimensions, ScrollView, Alert } from 'react-native';
 import { IScreenProps } from '../shared/apitypes';
 import { Play } from '../components/svgs';
 import Container from '../components/Container';
@@ -13,6 +13,7 @@ import { style } from './StoryInfoScreen.style';
 import { setUser } from '../stores';
 import StoryImage from 'components/StoryImage';
 import useRequest from 'utils/hooks/useRequest';
+import { useStripe } from '@stripe/stripe-react-native';
 
 export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   const [storyAlreadyAdded, setStoryAlreadyAdded] = useState(false);
   const [showConfirmAddToLibrary, setShowConfirmAddToLibrary] = useState(false);
   const [loadingAddToLibrary, setLoadingAddToLibrary] = useState(false);
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   const windowWidth = Dimensions.get('window').width;
 
@@ -31,6 +33,12 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
 
   const addStoryToUser: any = useRequest({
     url: '/userStoryTextMessages',
+    method: 'POST',
+    body: { storyId: currentStory._id },
+  })
+
+  const createIntent: any = useRequest({
+    url: '/intents',
     method: 'POST',
     body: { storyId: currentStory._id },
   })
@@ -57,7 +65,22 @@ export default function StoryInfoScreen({ navigation, route }: IScreenProps) {
   }, [addStoryToUser.data])
 
   const addToLibrary = async () => {
+    //todo: add error handling
     setLoadingAddToLibrary(true);
+
+    // const result = await createIntent.mutateAsync();
+
+    // const initResponse = await initPaymentSheet({
+    //   merchantDisplayName: 'ttom',
+    //   paymentIntentClientSecret: result.clientSecret
+    // })
+
+    // const paymentResponse = await presentPaymentSheet();
+
+    // if (paymentResponse.error) {
+    //   Alert.alert(`Error code: ${paymentResponse.error.code}`, paymentResponse.error.message);
+    // }
+
     await addStoryToUser.mutateAsync();
     setLoadingAddToLibrary(false);
   };

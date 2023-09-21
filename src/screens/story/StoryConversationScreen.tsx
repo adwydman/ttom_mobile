@@ -79,6 +79,8 @@ function Message({ type, children, timestamp, extraStyles = {}, shouldShowTail, 
 
   const shouldShowNameInGroupChat = (type === 'left') && (conversation.whoTo.split(';').length > 1) && (previousMessage === undefined || previousMessage.whoFrom !== conversation.whoFrom)
 
+  console.log('children', children)
+
   return (
     <Pressable
       style={{ position: 'relative' }}

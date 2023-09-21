@@ -15,6 +15,9 @@ import StoryTextMessagesScreen from 'screens/story/StoryTextMessagesScreen';
 import StoryConversationScreen from 'screens/story/StoryConversationScreen';
 import StoryPhotosScreen from 'screens/story/StoryPhotosScreen';
 import StoryIndividualPhotoScreen from 'screens/story/StoryIndividualPhotoScreen';
+import StoryVoicemailScreen from 'screens/story/StoryVoicemailScreen';
+import StoryAllEmailsScreen from 'screens/story/StoryAllEmailsScreen';
+import StoryIndividualEmailScreen from 'screens/story/StoryIndividualEmailScreen';
 import LoadingSplash from './LoadingSplash';
 import { setUser, setUserToken } from '../stores';
 import useAsyncEffect from 'utils/hooks/useAsyncEffect';
@@ -30,7 +33,6 @@ export default function Navigator() {
 
   const [fontsLoaded] = useFonts({
     BelyDisplay: require('../assets/fonts/BelyDisplay.otf'),
-    RobotoMedium: require('../assets/fonts/Roboto-Medium.ttf'),
     Niveau_smallCaps: require('../assets/fonts/Niveau_smallCaps.ttf'),
     NiveauGroteskMedium: require('../assets/fonts/NiveauGroteskMedium.ttf'),
     NiveauGroteskRegular: require('../assets/fonts/NiveauGroteskRegular.ttf'),
@@ -74,6 +76,9 @@ export default function Navigator() {
             <Stack.Screen name="StoryConversation" component={StoryConversationScreen} options={({ route }) => ({ title: route.params.screenTitle })} />
             <Stack.Screen name="StoryPhotos" component={StoryPhotosScreen} options={() => ({ title: 'Photos' })} />
             <Stack.Screen name="StoryIndividualPhoto" component={StoryIndividualPhotoScreen} options={() => ({ title: '' })} />
+            <Stack.Screen name="StoryVoicemail" component={StoryVoicemailScreen} options={() => ({ title: 'Voicemail' })} />
+            <Stack.Screen name="StoryAllEmails" component={StoryAllEmailsScreen} options={() => ({ title: 'Email' })} />
+            <Stack.Screen name="StoryIndividualEmail" component={StoryIndividualEmailScreen} />
           </>
           :
           <>

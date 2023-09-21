@@ -119,11 +119,14 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
         navigation.navigate('StoryMessages')
       }
     },
-    // {
-    //   name: 'Email',
-    //   imagePath: require('../../assets/images/icons/Email.png'),
-    //   backgroundColor: colors.orange,
-    // },
+    {
+      name: 'Email',
+      imagePath: require('../../assets/images/icons/Email.png'),
+      backgroundColor: colors.orange,
+      onPress: () => {
+        navigation.navigate('StoryAllEmails');
+      }
+    },
     ...(storyPhotos.length ? [{
         name: 'Photos',
         imagePath: require('../../assets/images/icons/Photos.png'),
@@ -158,11 +161,14 @@ export default function StoryHomeScreen({ navigation, route }: IScreenProps) {
     //   imagePath: require('../../assets/images/icons/Internet.png'),
     //   backgroundColor: colors.white,
     // },
-    // {
-    //   name: 'Phone',
-    //   imagePath: require('../../assets/images/icons/Phone.png'),
-    //   backgroundColor: colors.white,
-    // },
+    {
+      name: 'Voicemail',
+      imagePath: require('../../assets/images/icons/Phone.png'),
+      backgroundColor: colors.white,
+      onPress: () => {
+        navigation.navigate('StoryVoicemail');
+      }
+    },
     // {
     //   name: 'Clock',
     //   imagePath: require('../../assets/images/icons/Clock.png'),

@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 import * as Facebook from 'expo-auth-session/providers/facebook';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import Button from 'components/Button';
 import Text from 'components/Text';
 import Container from 'components/Container';
@@ -42,6 +43,22 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
     // expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
     clientId: '1407162533479919',
   });
+
+  const applePromptAsync = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ]
+      })
+  
+      console.log('credential', credential)
+    } catch(e) {
+      console.log('e', e)
+    }
+  }
+
   const dispatch = useDispatch();
   
   const windowWidth = Dimensions.get('window').width;
@@ -243,10 +260,9 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
         disabled={!googleRequest}
         onPress={() => {
           googlePromptAsync();
-          // setThirdPartyLogin('google');
         }}
       >
-        <Text style={{ color: colors.white, fontFamily: 'RobotoMedium', fontSize: 18 }}>
+        <Text style={{ color: colors.white, fontSize: 18 }}>
           Sign in with Google
         </Text>
       </Button>
@@ -261,13 +277,39 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
         disabled={!facebookRequest}
         onPress={() => {
           facebookPromptAsync();
-          // setThirdPartyLogin('facebook');
         }}
       >
-        <Text style={{ color: colors.white, fontFamily: 'RobotoMedium', fontSize: 18 }}>
+        <Text style={{ color: colors.white, fontSize: 18 }}>
           Continue with Facebook
         </Text>
       </Button>
+
+      {/* <Button
+        buttonStyle={{
+          backgroundColor: colors.black,
+          borderColor: colors.black,
+          marginTop: 12
+        }}
+        image={<Image style={{position: 'absolute', left: 8 }} source={require('../assets/images/apple.png')} />}
+        disabled={!facebookRequest}
+        onPress={() => {
+          facebookPromptAsync();
+        }}
+      >
+        <Text style={{ color: colors.white, fontSize: 18 }}>
+          Sign in with Apple
+        </Text>
+      </Button> */}
+      <View style={{ marginTop: 12 }}>
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={mode === 'login' ? AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN : AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={0}
+          style={{height: 48}}
+          onPress={applePromptAsync}
+        />
+      </View>
+
       <View style={{ position: 'absolute', bottom: 40, width: '100%' }}>
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
           {footer}
