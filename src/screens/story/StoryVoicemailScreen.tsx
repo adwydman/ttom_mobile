@@ -6,10 +6,13 @@ import StoryFrame from './StoryFrame';
 import { IScreenProps } from '../../shared/apitypes';
 import Text from 'components/Text'
 import { H3 } from 'components/Headers'
+import { Audio } from 'expo-av';
+
 import { ChevronRight, Contact, NewMessage, Pause, Play } from 'components/svgs';
 import { style } from './StoryTextMessagesScreen.style';
 import CatSteps from 'components/CatSteps';
 import { colors } from '../../colors';
+import useAsyncEffect from 'utils/hooks/useAsyncEffect';
 
 const MAX_MESSAGE_LENGTH = 75
 
@@ -35,7 +38,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     position: 'absolute',
     left: 24,
-    // width: '100%'
+  },
+  row2: {
+    flex: 1,
+    flexDirection: 'row',
+    position: 'absolute',
+    left: 24
+  },
+  loading: {
+    right: 36,
+    top: 3
   },
   firstRow: {
     top: 12
@@ -69,16 +81,34 @@ interface IVoicemailItemProps {
   voicemail: any;
   currentlyPlayingMessageId: any;
   setCurrentlyPlayingMessageId: any;
+  navigation: any;
 }
 
 const WIDTH_OFFSET = 36;
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const ROW_WIDTH = WINDOW_WIDTH - WIDTH_OFFSET;
 
-function VoicemailItem({voicemail, currentlyPlayingMessageId, setCurrentlyPlayingMessageId}: IVoicemailItemProps) {
-  const { id, contactName, contactSecondaryMessage, timestamp, duration } = voicemail;
+//todo: add duration
+
+function VoicemailItem({voicemail, currentlyPlayingMessageId, setCurrentlyPlayingMessageId, navigation}: IVoicemailItemProps) {
+  const { id, contactName, contactSecondaryMessage, timestamp, duration, url } = voicemail;
   const [showPlayButton, setShowPlayButton] = useState(false);
-  const [playVoicemail, setPlayVoicemail] = useState(false);
+  const [sound, setSound] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', () => {
+      if (sound) {
+        setSound(null);
+        sound.unloadAsync();
+        setCurrentlyPlayingMessageId(null);
+      }
+    })
+
+    return unsubscribe;
+  }, [navigation, sound]);
+
 
   let wrapperStyle = { ...styles.wrapper };
 
@@ -94,11 +124,25 @@ function VoicemailItem({voicemail, currentlyPlayingMessageId, setCurrentlyPlayin
     }
   }
 
-  useEffect(() => {
-    if (currentlyPlayingMessageId && currentlyPlayingMessageId !== id) {
-      setPlayVoicemail(false);
+  useAsyncEffect(async () => {
+    if (currentlyPlayingMessageId === id) {
+      setIsLoading(true);
+      const { sound } = await Audio.Sound.createAsync({ uri: url }, undefined, (status) => {
+        if (status.didJustFinish) {
+          setCurrentlyPlayingMessageId(null);
+        }
+      });
+      setSound(sound);
+
+      await sound.playAsync();
+      setIsLoading(false);
+    } else {
+      if (sound) {
+        sound.unloadAsync();
+        setSound(null);
+      }
     }
-  }, [currentlyPlayingMessageId])
+  }, [currentlyPlayingMessageId]);
 
   return (
     <Pressable style={wrapperStyle} onPress={() => { setShowPlayButton(!showPlayButton) }}>
@@ -113,19 +157,36 @@ function VoicemailItem({voicemail, currentlyPlayingMessageId, setCurrentlyPlayin
         </View>
         {
           showPlayButton && (
-            <Pressable
-              style={{...styles.row, ...styles.thirdRow }}
-              onPress={() => { 
-                setPlayVoicemail(!playVoicemail)
-                setCurrentlyPlayingMessageId(id);
-              }}
-            >
-              { playVoicemail && <Pause width={24} height={24} style={styles.pause} /> }
-              { !playVoicemail && <Play width={24} height={24} /> }
-              <Text style={styles.playMessageText}>
-                { playVoicemail ? 'Pause' : 'Play' } message
-              </Text>
-            </Pressable>
+            <View style={{...styles.thirdRow }}>
+
+              {
+                currentlyPlayingMessageId === id && <>
+                  <Pressable 
+                    style={styles.row2}
+                    onPress={async () => {
+                      setCurrentlyPlayingMessageId(null);
+                    }}
+                  >
+                    <Pause width={24} height={24} style={styles.pause} />
+                    <Text style={styles.playMessageText}>Pause message</Text>
+                    { isLoading && <Text style={styles.loading}>Loading...</Text> }
+                  </Pressable>
+                </>
+              }
+              {
+                currentlyPlayingMessageId !== id &&
+                <Pressable 
+                  style={styles.row2}
+                  onPress={async () => { 
+                    setCurrentlyPlayingMessageId(id);
+                  }}
+                >
+                  <Play width={24} height={24} style={styles.pause} />
+                  <Text style={styles.playMessageText}>Play message</Text>
+                  { isLoading && <Text style={styles.loading}>Loading...</Text> }
+                </Pressable>
+              }
+            </View>
           )
         }
       </View>
@@ -139,14 +200,16 @@ const data = [
     contactName: '+1 (555) 444-3333',
     contactSecondaryMessage: 'Chicago, IL',
     timestamp: '3:31 AM',
-    duration: '0:42',
+    // duration: '0:42',
+    url: 'https://download.samplelib.com/mp3/sample-3s.mp3',
   },
   {
     id: 2,
     contactName: 'Ed Johnson',
     contactSecondaryMessage: 'mobile',
     timestamp: '12:52 PM',
-    duration: '4:20',
+    // duration: '4:20',
+    url: 'https://file-examples.com/storage/fe7fa6fa10650d95e925ca2/2017/11/file_example_MP3_700KB.mp3',
   },
 ]
 
@@ -173,6 +236,7 @@ export default function StoryTextMessagesScreen({ navigation, route }: IScreenPr
           voicemail={voicemail}
           currentlyPlayingMessageId={currentlyPlayingMessageId}
           setCurrentlyPlayingMessageId={setCurrentlyPlayingMessageId}
+          navigation={navigation}
         />)
       }
 

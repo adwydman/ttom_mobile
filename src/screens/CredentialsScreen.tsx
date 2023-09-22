@@ -34,26 +34,30 @@ export default function CredentialsScreen({ mode, navigation }: IProps) {
   // const [thirdPartyLogin, setThirdPartyLogin] = useState<ThirdPartyLogin | null>(null);
   const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
     // androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
-    // expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
+    expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
     iosClientId: '486721598631-ooordmrt1e2so7u8r3bq3a70usap2gra.apps.googleusercontent.com',
   });
 
   const [facebookRequest, facebookResponse, facebookPromptAsync] = Facebook.useAuthRequest({
     // androidClientId: "GOOGLE_GUID.apps.googleusercontent.com",
-    // expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
+    expoClientId: '486721598631-430nbo80v6mj4e3uc9igiafi5of83ml9.apps.googleusercontent.com',
     clientId: '1407162533479919',
   });
 
   const applePromptAsync = async () => {
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ]
-      })
-  
-      console.log('credential', credential)
+      if (mode === 'login') {
+        const credential = await AppleAuthentication.signInAsync({
+          requestedScopes: [
+            AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+            AppleAuthentication.AppleAuthenticationScope.EMAIL,
+          ]
+        })
+    
+        console.log('credential', credential)
+      } else if (mode === 'register') {
+
+      }
     } catch(e) {
       console.log('e', e)
     }

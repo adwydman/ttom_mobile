@@ -122,7 +122,7 @@ export default function HomeScreen({ navigation }: IScreenProps) {
         ListHeaderComponent={
           <>
             {
-              user.stories.length > 0 && <Container>
+              (user.stories || []).length > 0 && <Container>
                 <H1>
                   My Stories 
                   <Text style={{fontSize: 20}}> ({user.stories.length})</Text>
