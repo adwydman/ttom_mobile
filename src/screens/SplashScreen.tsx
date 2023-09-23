@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Button from 'components/Button';
 import Text from 'components/Text';
 import Container from 'components/Container';
@@ -16,22 +16,63 @@ export default function SplashScreen({ navigation, route }: IScreenProps) {
   }
 
   return (
-    <View style={{height: '100%', justifyContent: 'center', backgroundColor: colors.yellow, position: 'relative'}}>
-      <SplashWave1 style={{ position: 'absolute', top: '5%'}}/>
-      <SplashWave2 style={{ position: 'absolute', top: '15%'}}/>
-      <View style={{ display: 'flex', alignItems: 'center' }}>
-        <TtomLogo />
-        <Text style={{ color: colors.blue, fontSize: 96, fontFamily: 'BelyDisplay'}}>ttom</Text>
-        <Text style={{ color: colors.blue, fontSize: 24 }}>a chat fiction app for grown-ups</Text>
+    <>
+      <View style={styles.wrapper}>
+        <SplashWave1 style={styles.wave1}/>
+        <SplashWave2 style={styles.wave2}/>
+        <View style={styles.textContainer}>
+          <TtomLogo />
+          <Text style={styles.ttomText}>ttom</Text>
+          <Text style={styles.description}>a chat fiction app for grown-ups</Text>
+        </View>
       </View>
       <Container>
-        <View style={{position: 'absolute', marginTop: '30%', width: '100%'}}>
-          <View style={{marginBottom: 8}}>
+        <View style={styles.buttonsContainer}>
+          <View style={styles.loginButton}>
             <Button onPress={onLoginPress} type={'empty'}>Log in</Button>
           </View>
           <Button onPress={onSignUpPress}>Sign up</Button>
         </View>
       </Container>
-    </View>
+    </>
   )
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    height: '100%',
+    justifyContent: 'center',
+    backgroundColor: colors.yellow,
+    position: 'relative',
+  },
+  wave1: {
+    position: 'absolute',
+    top: '5%'
+  },
+  wave2: {
+    position: 'absolute',
+    top: '15%'
+  },
+  textContainer: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  ttomText: {
+    fontSize: 96,
+    color: colors.blue,
+    fontFamily: 'BelyDisplay',
+  },
+  description: {
+    fontSize: 24,
+    color: colors.blue,
+  },
+  buttonsContainer: {
+    position: 'absolute',
+    bottom: 36,
+    left: 0,
+    right: 0
+  },
+  loginButton: {
+    marginBottom: 8
+  }
+});

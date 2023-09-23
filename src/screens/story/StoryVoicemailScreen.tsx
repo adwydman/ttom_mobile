@@ -95,7 +95,6 @@ function VoicemailItem({voicemail, currentlyPlayingMessageId, setCurrentlyPlayin
   const [showPlayButton, setShowPlayButton] = useState(false);
   const [sound, setSound] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', () => {
